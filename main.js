@@ -1,3 +1,8 @@
 import App from "./app/app.js"
 
-new App
+const components = [
+    "Button",
+    "IngredientsSection"
+]
+
+new App(components)

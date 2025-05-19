@@ -1,11 +1,21 @@
 export default class WebComponent extends HTMLElement {
-    constructor(html,css) {
-        super();
-        this.attachShadow({ mode: 'open' });
-        console.log(html,css)
-        this.shadowRoot.innerHTML = html
-        console.log(css)
-        this.shadowRoot.adoptedStyleSheets = [css];
+  // Gets filled in the defineComponents method in App.js
+  static globalStylesheet = null;
+  /**
+   * @param {string} html
+   * @param {CSSStyleSheet} css
+   */
+  constructor(html, css) {
+    super();
 
+    this.attachShadow({ mode: "open" });
+
+    if (html) {
+      this.shadowRoot.innerHTML = html;
     }
+
+    if (css) {
+      this.shadowRoot.adoptedStyleSheets = [css, WebComponent.globalStylesheet];
+    }
+  }
 }

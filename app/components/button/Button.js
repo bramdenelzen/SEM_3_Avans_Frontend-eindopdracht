@@ -1,15 +1,16 @@
-import WebComponent from '../../Webcomponent.js';
+import WebComponent from "../../Webcomponent.js";
 
-export default class Button extends WebComponent{
-    static css;
-    static html;
-
-    constructor(label) {
+export default class Button extends WebComponent {
+   
+  constructor() {
     super(Button.html, Button.css);
-    this.label = label;
+
+    this.shadowRoot
+      .querySelector("button")
+      .addEventListener("click", this._handleClick.bind(this));
   }
 
-  render() {
-    return `<button>${this.label}</button>`;
+  _handleClick() {
+    console.log("Button clicked!");
   }
 }

@@ -1,17 +1,36 @@
+import WebComponent from "./Webcomponent.js";
+
 export default class App {
-  constructor() {
-    console.log("App initialized");
+  /**
+   *
+   * @param {string[]} components
+   */
+  constructor(components) {
+    this._defineComponents(components);
 
-    this._defineComponents(["Button"]);
+    document.body.appendChild(document.createElement("x-ingredientssection"));
   }
-
   /**
    * @param {string[]} componentNames - Array of paths to components
    * @private
    * @description This method is used to define components in the app.
    */
-  _defineComponents(componentNames) {
+  async _defineComponents(componentNames) {
     const basePath = "/app/components/";
+
+     const globalStylesheet = await fetch("global.css").then(async (response)=>{
+        if (!response.ok) {
+            throw new Error(`Could not load CSS file: ${response.status}`);
+        }
+        const cssText = await response.text();
+    
+        const sheet = new CSSStyleSheet();
+        sheet.replace(cssText);
+    
+        return sheet;
+    })
+
+    WebComponent.globalStylesheet = globalStylesheet;
 
     componentNames.forEach(async (componentName) => {
       try {
@@ -25,7 +44,7 @@ export default class App {
             throw new Error(`Could not load CSS file: ${response.status}`);
           }
           const cssText = await response.text();
-          
+
           const sheet = new CSSStyleSheet();
           await sheet.replace(cssText);
 
@@ -56,8 +75,5 @@ export default class App {
         console.error(error);
       }
     });
-    console.log("Components defined");
-
-    document.body.appendChild(document.createElement("x-button"));
   }
 }
