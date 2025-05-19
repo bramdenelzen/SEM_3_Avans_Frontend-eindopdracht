@@ -2,6 +2,8 @@ import App from "./app/app.js";
 
 const components = ["Button", "IngredientsSection", "Header"];
 
-const pages = ["Home", "Layout"];
+const pages = ["Home"];
 
-new App(components, pages);
+const layouts = ["Layout"];
+
+new App(components, pages, layouts);

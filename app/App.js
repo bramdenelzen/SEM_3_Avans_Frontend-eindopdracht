@@ -5,18 +5,19 @@ export default class App {
    *
    * @param {string[]} components
    */
-  constructor(components, pages) {
+  constructor(components, pages, layouts) {
     this._defineWebComponents("/app/components/",components);
     this._defineWebComponents("/app/pages/",pages);
+    this._defineWebComponents("/app/layouts/",layouts);
 
     document.body.appendChild(document.createElement("x-home"));
   }
   /**
-   * @param {string[]} components - Array of paths to components
+   * @param {string[]} webComponents - Array of paths to components
    * @private
    * @description This method is used to define components in the app.
    */
-  async _defineWebComponents(basePath,components) {
+  async _defineWebComponents(basePath,webComponents) {
 
      const globalStylesheet = await fetch("global.css").then(async (response)=>{
         if (!response.ok) {
@@ -33,7 +34,7 @@ export default class App {
     WebComponent.globalStylesheet = globalStylesheet;
 
 
-    components.forEach(async (componentName) => {
+    webComponents.forEach(async (componentName) => {
       try {
         const componentPath =
           basePath + componentName.toLocaleLowerCase() + "/" + componentName;
