@@ -1,44 +1,27 @@
-import Gui from "./gui/Gui.js";
-import Ingredient from "./database/models/Ingredient.js";
-import Jar from "./database/models/Jar.js";
-import Model from "./database/models/Model.js";
-import Db from "./database/Db.js";
+import "./setup.js"
+import User from './database/models/User.js';
 
-new Gui();
 
-const ingredientmodel = new Ingredient({
-  name: "ingredeitt",
-  description: "test",
-  quantity: 1,
-  unit: "kg",
-});
+const john = new User("John", 33);
+await john.save();
 
-new Ingredient({
-  name: "ingredeitt",
-  description: "test",
-  quantity: 1,
-  unit: "kg",
-});
+john.age = 34;
 
-new Ingredient({
-  name: "ingredeitt",
-  description: "test",
-  quantity: 1,
-  unit: "kg",
-});
+console.log(john.greet()); 
 
-const jarModel = new Jar({
-  name: "jar",
-  description: "test",
-  quantity: 1,
-  amount: "kg",
-  ingredientId: ingredientmodel.id,
-});
 
-console.log((ingredientmodel.description = "asdas"));
+const bob = await User.findById(  1747857952650 )
 
-console.log(ingredientmodel.all);
+bob.name = "Bob";
+bob.age = 39;
+bob.save()
 
-console.log(jarModel.all)
+console.log(bob.greet()); 
 
-console.log(Db.getAllRecords())
+
+const jesse = await User.findById(  1747857952650 )
+
+// jesse.name = "Jesse";
+
+console.log(jesse.greet()); 
+// john.delete();

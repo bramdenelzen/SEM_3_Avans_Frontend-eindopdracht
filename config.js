@@ -1,10 +1,11 @@
-import BaseDbHandler from "./database/handlers/BaseDbHandler.js";
+import LocalStorageDB from "./database/handlers/LocalStorageDB.js";
 
 
 
-export const config = {
+export default {
+  // Database configuration
   db: {
-    handler: BaseDbHandler.constructor,
+    handler: LocalStorageDB
   },
   debug: true,
 };

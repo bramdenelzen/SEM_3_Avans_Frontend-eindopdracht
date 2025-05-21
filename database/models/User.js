@@ -1,0 +1,22 @@
+import BaseModel from './BaseModel.js';
+
+export default class User extends BaseModel {
+  static modelName = "users";
+
+
+  constructor(nameOrData, age) {
+    // Support both `new User({ id, name, age })` and `new User(name, age)`
+    let data;
+    if (typeof nameOrData === 'object') {
+      data = nameOrData;
+    } else {
+      data = { name: nameOrData, age };
+    }
+
+    super(User.modelName, data);
+  }
+
+  greet() {
+    return `Hi, I'm ${this.name} and I'm ${this.age}`;
+  }
+}

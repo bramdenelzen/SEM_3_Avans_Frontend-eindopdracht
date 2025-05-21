@@ -1,7 +1,7 @@
 import Ingredient from "./Ingredient.js";
-import Model from "./Model.js";
+import BaseModel from "./BaseModel.js";
 
-export default class Jar extends Model {
+export default class Jar extends BaseModel {
   static schema = {
     name: {
       type: "string",
