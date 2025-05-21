@@ -1,20 +1,19 @@
-import "./setup.js"
-import User from './database/models/User.js';
-
+import "./setup.js";
+import User from "./database/models/User.js";
 
 const john = new User("John", 33);
 const savedjohn = await john.save();
 
 john.age = 34;
 
-console.log(john); 
+console.log(john);
 
-const bob =   await User.findById(savedjohn.id);
+const bob = await User.findById(savedjohn.id);
 
-console.log(bob)
+console.log(bob);
 
 bob.name = "Bob";
+
 bob.age = 39;
 await bob.save();
-console.log(bob.greet()); 
-
+console.log(bob.greet());
