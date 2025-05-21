@@ -1,4 +1,4 @@
-import DatabaseInterface from './DatabaseInterface.js';
+import DatabaseInterface from "./DatabaseInterface.js";
 
 export default class RuntimeStorageDB extends DatabaseInterface {
   constructor() {
@@ -17,7 +17,7 @@ export default class RuntimeStorageDB extends DatabaseInterface {
   async create(modelName, data) {
     const store = this._getModelStore(modelName);
     const id = this.idCounter++;
-    const newData = { id, ...data };
+    const newData = { ...data, id };
     store.set(id, newData);
     return { ...newData };
   }
@@ -27,11 +27,11 @@ export default class RuntimeStorageDB extends DatabaseInterface {
     const all = Array.from(store.values());
 
     // Simple query filtering: match all key/value pairs
-    const filtered = all.filter(record =>
+    const filtered = all.filter((record) =>
       Object.entries(query).every(([key, value]) => record[key] === value)
     );
 
-    return filtered.map(record => ({ ...record }));
+    return filtered.map((record) => ({ ...record }));
   }
 
   async update(modelName, id, updates) {
