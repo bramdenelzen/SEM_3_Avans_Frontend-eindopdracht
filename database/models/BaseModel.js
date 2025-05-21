@@ -63,5 +63,6 @@ export default class BaseModel {
     const rawRecords = await this.db.read(this.modelName, { id });
     if (rawRecords.length === 0) return null;
     return new this(rawRecords[0]); // return class instance
+    
   }
 }
