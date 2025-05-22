@@ -1,7 +1,9 @@
 import WebComponent from "./Webcomponent.js";
 
 export default class Gui {
-  static registeredGuiFiles = null;
+  static Instance = null;
+
+  registeredGuiFiles = null;
 
   /**
    * @param {
@@ -12,22 +14,28 @@ export default class Gui {
    * }
    * } components
    */
-  static setup(components) {
-    Gui.registeredGuiFiles = components;
+  constructor(components) {
+    if (Gui.Instance) {
+      return Gui.Instance;
+    } else {
+      Gui.Instance = this;
+    }
 
-    if (Gui.registeredGuiFiles === null) {
+    this.registeredGuiFiles = components;
+
+    if (this.registeredGuiFiles === null) {
       throw new Error(
         "Gui.registeredGuiFiles is not set. Please set it before using the Gui class."
       );
     }
 
-    Gui.getGlobalStylesheet();
-    Gui._defineWebComponents(
+    this.getGlobalStylesheet();
+    this._defineWebComponents(
       "/gui/components/",
-      Gui.registeredGuiFiles.components
+      this.registeredGuiFiles.components
     );
-    Gui._defineWebComponents("/gui/pages/", Gui.registeredGuiFiles.pages);
-    Gui._defineWebComponents("/gui/layouts/", Gui.registeredGuiFiles.layouts);
+    this._defineWebComponents("/gui/pages/", this.registeredGuiFiles.pages);
+    this._defineWebComponents("/gui/layouts/", this.registeredGuiFiles.layouts);
   }
 
   /**
@@ -35,7 +43,7 @@ export default class Gui {
    * @private
    * @description This method is used to define components in the app.
    */
-  static async _defineWebComponents(basePath, webComponents) {
+   async _defineWebComponents(basePath, webComponents) {
     if (Array.isArray(webComponents)) {
       webComponents.forEach(async (componentName) => {
         try {
@@ -83,7 +91,7 @@ export default class Gui {
     }
   }
 
-  static async getGlobalStylesheet() {
+   async getGlobalStylesheet() {
     const globalStylesheet = await fetch("global.css").then(
       async (response) => {
         if (!response.ok) {

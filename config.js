@@ -5,13 +5,16 @@ import Home from "./gui/pages/home/Home.js";
 
 export default {
   // Database configuration
-  db: {
+  Db: {
     handler: RuntimeDBStorage,
   },
-  routes: {
-    "/": () => `<x-home></x-home>`,
-    "/about": () => `<x-mixingroom>About</x-mixingroom>`,
-    "/mixingroom/{id}": ({ id }) => `<x-mixingroom id="${id}"></x-mixingroom>`,
+  Router: {
+    routes: {
+      "/": () => `<x-home></x-home>`,
+      "/about": () => `<x-mixingroom>About</x-mixingroom>`,
+      "/mixingroom/{id}": ({ id }) =>
+        `<x-mixingroom id="${id}"></x-mixingroom>`,
+    },
   },
   Gui: {
     registeredGuiFiles: {

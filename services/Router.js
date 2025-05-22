@@ -1,5 +1,14 @@
 export default class Router {
+    static router = null
+
   constructor(routes, targetId = "app") {
+
+    if (Router.router){
+        return Router.router
+    }else{
+        Router.router = this
+    }
+
     this.routes = routes;
     this.appElement = document.getElementById(targetId);
     window.addEventListener("hashchange", () => this.route());
