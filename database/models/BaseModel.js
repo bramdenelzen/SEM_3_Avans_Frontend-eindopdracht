@@ -4,7 +4,7 @@ export default class BaseModel {
   static db = null;
 
   /**
-   * @param {DatabaseInterface} databaseInstance 
+   * @param {DatabaseInterface} databaseInstance
    */
   static configureDatabase(databaseInstance) {
     this.db = databaseInstance;
@@ -22,12 +22,35 @@ export default class BaseModel {
     Object.assign(this, data);
   }
 
+  _validate(data) {
+    for (const key in data) {
+      if (key == "id") continue; // Skip ID validation
+      if (this.constructor.schema[key]) {
+        if (this.constructor.schema[key].type == typeof data[key]) {
+          this[key] = data[key];
+        } else {
+          throw new Error(
+            `Invalid type for property ${key}. Expected ${
+              this.constructor.schema[key].type
+            }, got ${typeof data[key]}`
+          );
+        }
+      } else {
+        throw new Error(`Invalid property ${key} for model ${this.modelName}`);
+      }
+    }
+  }
+
   // Save = create or update
   async save() {
     if (this.id) {
       return this.update();
     } else {
-      const saved = await this.constructor.db.create(this.modelName, this._getData());
+      this._validate(this._getData());
+      const saved = await this.constructor.db.create(
+        this.modelName,
+        this._getData()
+      );
       Object.assign(this, saved); // Update instance with ID and any changes
       return this;
     }
@@ -35,7 +58,12 @@ export default class BaseModel {
 
   async update() {
     if (!this.id) throw new Error("Cannot update unsaved instance.");
-    const updated = await this.constructor.db.update(this.modelName, this.id, this._getData());
+    this._validate(this._getData());
+    const updated = await this.constructor.db.update(
+      this.modelName,
+      this.id,
+      this._getData()
+    );
     Object.assign(this, updated);
     return this;
   }
@@ -56,13 +84,12 @@ export default class BaseModel {
   // Static method to find and return instances
   static async find(query = {}) {
     const rawRecords = await this.db.read(this.modelName, query);
-    return rawRecords.map(data => new this(data)); // return class instances
+    return rawRecords.map((data) => new this(data)); // return class instances
   }
 
-  static async findById(id){
+  static async findById(id) {
     const rawRecords = await this.db.read(this.modelName, { id });
     if (rawRecords.length === 0) return null;
     return new this(rawRecords[0]); // return class instance
-    
   }
 }
