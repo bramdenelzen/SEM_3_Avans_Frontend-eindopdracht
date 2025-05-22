@@ -4,7 +4,6 @@ export default class User extends BaseModel {
   static modelName = "users";
 
   static schema = {
-
     name: {
       type: "string",
       required: true,

@@ -23,4 +23,8 @@ bob.age = 39;
 await bob.save();
 console.log(bob.greet());
 
-console.log(await User.find())
+console.log(await User.find({name: "Bob"}));
+
+window.addEventListener("hashchange",async(e)=>{
+    console.log(e)
+})
