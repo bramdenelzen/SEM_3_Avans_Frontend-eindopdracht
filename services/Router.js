@@ -20,9 +20,9 @@ export default class Router {
   }
 
   matchRoute(path) {
-    for (const [pattern, view] of Object.entries(this.routes)) {
+    for (const [routePath, routeContentFunction] of Object.entries(this.routes)) {
       const paramNames = [];
-      const regexPattern = pattern.replace(/{([^}]+)}/g, (_, name) => {
+      const regexPattern = routePath.replace(/{([^}]+)}/g, (_, name) => {
         paramNames.push(name);
         return "([^/]+)";
       });
@@ -35,7 +35,7 @@ export default class Router {
           acc[name] = match[index + 1];
           return acc;
         }, {});
-        return { view, params };
+        return {  routeContentFunction, params };
       }
     }
     return null;
@@ -47,9 +47,9 @@ export default class Router {
 
     if (match) {
       const html =
-        typeof match.view === "function"
-          ? match.view(match.params)
-          : match.view;
+        typeof match.routeContentFunction === "function"
+          ? match.routeContentFunction(match.params)
+          : match.routeContentFunction;
       this.appElement.innerHTML = html;
     } else {
       this.appElement.innerHTML = `<x-error status="404" message="Not found"></x-error>`;
