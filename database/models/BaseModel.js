@@ -23,6 +23,12 @@ export default class BaseModel {
   }
 
   _validate(data) {
+    for (const key in this.constructor.schema) {
+      if (key.required && (!data[key] || data[key] == "" || data[key] == NaN)) {
+        throw new Error(`Field ${key} is required`);
+      }
+    }
+
     for (const key in data) {
       if (key == "id") continue; // Skip ID validation
       if (this.constructor.schema[key]) {

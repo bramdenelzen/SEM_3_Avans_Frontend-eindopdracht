@@ -1,0 +1,30 @@
+<div class="main-container">
+  <h2>New ingredient</h2>
+  <p id="error"></p>
+  <form id="ingredients-form">
+    <div class="inputfield">
+      <label for="minMixingTime">Minimal mixing time</label>
+      <input type="number" id="minMixingTime" name="minMixingTime" required />
+    </div>
+    <div class="inputfield">
+      <label for="minMixingSpeed">Minimal mixing speed</label>
+      <input type="number" id="minMixingSpeed" name="minMixingSpeed" required />
+    </div>
+    <div class="inputfield">
+      <label for="color">Color</label>
+      <input type="color" id="color" name="color" required />
+    </div>
+    <div class="inputfield">
+      <label for="texture">Texture</label>
+      <select id="texture" required name="texture">
+        <option value="liquid">Liquid</option>
+        <option value="solid">Solid</option>
+        <option value="powder">Powder</option>
+        <option value="gas">Gas</option>
+      </select>
+    </div>
+  </form>
+  <button type="submit" form="ingredients-form" class="btn primary">
+    Submit
+  </button>
+</div>

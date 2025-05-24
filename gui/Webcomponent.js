@@ -14,8 +14,6 @@ export default class WebComponent extends HTMLElement {
       this.shadowRoot.innerHTML = html;
     }
 
-    if (css) {
-      this.shadowRoot.adoptedStyleSheets = [css, WebComponent.globalStylesheet];
-    }
+    this.shadowRoot.adoptedStyleSheets = [css, WebComponent.globalStylesheet];
   }
 }

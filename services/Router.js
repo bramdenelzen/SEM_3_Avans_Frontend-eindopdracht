@@ -1,7 +1,7 @@
 export default class Router {
     static router = null
 
-  constructor(routes, targetId = "app") {
+  constructor(config, targetId = "app") {
 
     if (Router.router){
         return Router.router
@@ -9,10 +9,12 @@ export default class Router {
         Router.router = this
     }
 
-    this.routes = routes;
+    this.routes = config.routes;
     this.appElement = document.getElementById(targetId);
     window.addEventListener("hashchange", () => this.route());
     window.addEventListener("DOMContentLoaded", () => this.route());
+
+    this.route()
   }
 
   getCurrentPath() {

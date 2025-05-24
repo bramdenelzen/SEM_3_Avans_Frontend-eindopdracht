@@ -6,7 +6,7 @@ import Home from "./gui/pages/home/Home.js";
 export default {
   // Database configuration
   Db: {
-    handler: RuntimeDBStorage,
+    handler: SessionStorageDB,
   },
   Router: {
     routes: {
@@ -18,7 +18,14 @@ export default {
   },
   Gui: {
     registeredGuiFiles: {
-      components: ["Button", "IngredientsSection", "Header"],
+      components: [
+        "Button",
+        "IngredientsSection",
+        "Header",
+        "InputField",
+        "IngredientsForm",
+        "IngredientListItem",
+      ],
       pages: ["Home", "Error", "MixingRoom"],
       layouts: ["Layout"],
     },

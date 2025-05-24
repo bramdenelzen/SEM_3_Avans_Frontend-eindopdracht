@@ -5,6 +5,8 @@ export default class Gui {
 
   registeredGuiFiles = null;
 
+  loaded = false;
+
   /**
    * @param {
    * {
@@ -14,14 +16,14 @@ export default class Gui {
    * }
    * } components
    */
-  constructor(components) {
+  constructor(config) {
     if (Gui.Instance) {
       return Gui.Instance;
     } else {
       Gui.Instance = this;
     }
 
-    this.registeredGuiFiles = components;
+    this.registeredGuiFiles = config.registeredGuiFiles;
 
     if (this.registeredGuiFiles === null) {
       throw new Error(
@@ -29,13 +31,22 @@ export default class Gui {
       );
     }
 
-    this.getGlobalStylesheet();
-    this._defineWebComponents(
-      "/gui/components/",
-      this.registeredGuiFiles.components
-    );
-    this._defineWebComponents("/gui/pages/", this.registeredGuiFiles.pages);
-    this._defineWebComponents("/gui/layouts/", this.registeredGuiFiles.layouts);
+    this.getGlobalStylesheet().then(async () => {
+      await this._defineWebComponents(
+        "/gui/components/",
+        this.registeredGuiFiles.components
+      );
+      await this._defineWebComponents(
+        "/gui/pages/",
+        this.registeredGuiFiles.pages
+      );
+      await this._defineWebComponents(
+        "/gui/layouts/",
+        this.registeredGuiFiles.layouts
+      );
+
+      this.loaded = true;
+    });
   }
 
   /**
@@ -43,7 +54,7 @@ export default class Gui {
    * @private
    * @description This method is used to define components in the app.
    */
-   async _defineWebComponents(basePath, webComponents) {
+  async _defineWebComponents(basePath, webComponents) {
     if (Array.isArray(webComponents)) {
       webComponents.forEach(async (componentName) => {
         try {
@@ -91,22 +102,23 @@ export default class Gui {
     }
   }
 
-   async getGlobalStylesheet() {
-    const globalStylesheet = await fetch("global.css").then(
-      async (response) => {
-        if (!response.ok) {
-          console.log(response);
-          throw new Error(`Could not load CSS file: ${response.status}`);
+  async getGlobalStylesheet() {
+    if (!WebComponent.globalStylesheet) {
+      const globalStylesheet = await fetch("global.css").then(
+        async (response) => {
+          if (!response.ok) {
+            throw new Error(`Could not load CSS file: ${response.status}`);
+          }
+          const cssText = await response.text();
+          const sheet = new CSSStyleSheet();
+
+          sheet.replace(cssText);
+
+          return sheet;
         }
-        const cssText = await response.text();
+      );
 
-        const sheet = new CSSStyleSheet();
-        sheet.replace(cssText);
-
-        return sheet;
-      }
-    );
-
-    WebComponent.globalStylesheet = globalStylesheet;
+      WebComponent.globalStylesheet = globalStylesheet;
+    }
   }
 }
