@@ -6,7 +6,7 @@ import Home from "./gui/pages/home/Home.js";
 export default {
   // Database configuration
   Db: {
-    handler: SessionStorageDB,
+    handler: LocalStorageDB,
   },
   Router: {
     routes: {

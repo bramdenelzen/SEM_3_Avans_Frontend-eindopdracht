@@ -12,25 +12,22 @@ export default class IngredientsSection extends WebComponent {
     this.ingredientListElement =
       this.shadowRoot.getElementById("ingredient-list");
 
-      const form =this.shadowRoot.querySelector("x-ingredientsform");
+    const form = this.shadowRoot.querySelector("x-ingredientsform");
 
     this.seedList();
 
-    
-      form.addEventListener("submitSucces", (event) => {
-        const ingredient = event.detail.data;
+    form.addEventListener("submitSucces", (event) => {
+      const ingredient = event.detail.data;
 
-        const ingredientListItemElement = document.createElement(
-          "x-ingredientlistitem"
-        );
-        ingredientListItemElement.ingredient = ingredient;
+      const ingredientListItemElement = document.createElement(
+        "x-ingredientlistitem"
+      );
+      ingredientListItemElement.ingredient = ingredient;
 
-        // Add the new ingredient to the top of the list
-        this.ingredientListElement.prepend(ingredientListItemElement);
-        // this.ingredientListElement.appendChild(ingredientListItemElement);
+      this.ingredientListElement.prepend(ingredientListItemElement);
 
-        form.hidePopover();
-      });
+      form.hidePopover();
+    });
   }
 
   async seedList() {
@@ -40,6 +37,7 @@ export default class IngredientsSection extends WebComponent {
       const ingredientListItemElement = document.createElement(
         "x-ingredientlistitem"
       );
+
       ingredientListItemElement.ingredient = ingredient;
 
       this.ingredientListElement.prepend(ingredientListItemElement);
