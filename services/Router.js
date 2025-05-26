@@ -1,12 +1,11 @@
 export default class Router {
-    static router = null
+  static router = null;
 
   constructor(config, targetId = "app") {
-
-    if (Router.router){
-        return Router.router
-    }else{
-        Router.router = this
+    if (Router.router) {
+      return Router.router;
+    } else {
+      Router.router = this;
     }
 
     this.routes = config.routes;
@@ -14,7 +13,7 @@ export default class Router {
     window.addEventListener("hashchange", () => this.route());
     window.addEventListener("DOMContentLoaded", () => this.route());
 
-    this.route()
+    this.route();
   }
 
   getCurrentPath() {
@@ -22,7 +21,9 @@ export default class Router {
   }
 
   matchRoute(path) {
-    for (const [routePath, routeContentFunction] of Object.entries(this.routes)) {
+    for (const [routePath, routeContent] of Object.entries(
+      this.routes
+    )) {
       const paramNames = [];
       const regexPattern = routePath.replace(/{([^}]+)}/g, (_, name) => {
         paramNames.push(name);
@@ -37,7 +38,7 @@ export default class Router {
           acc[name] = match[index + 1];
           return acc;
         }, {});
-        return {  routeContentFunction, params };
+        return { routeContent, params };
       }
     }
     return null;
@@ -48,10 +49,9 @@ export default class Router {
     const match = this.matchRoute(path);
 
     if (match) {
-      const html =
-        typeof match.routeContentFunction === "function"
-          ? match.routeContentFunction(match.params)
-          : match.routeContentFunction;
+      this.currentParams = match.params; // <-- Update current params
+
+      const html = match.routeContent;
       this.appElement.innerHTML = html;
     } else {
       this.appElement.innerHTML = `<x-error status="404" message="Not found"></x-error>`;
@@ -60,5 +60,9 @@ export default class Router {
 
   navigate(path) {
     location.hash = path;
+  }
+
+  getParams() {
+    return this.currentParams;
   }
 }

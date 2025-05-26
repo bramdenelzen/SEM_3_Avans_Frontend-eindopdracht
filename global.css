@@ -79,6 +79,11 @@
     background-color: var(--primary-color);
     color: var(--base-0);
   }
+
+  &.secondary {
+    background-color: var(--secondary-color);
+    color: var(--base-0);
+  }
 }
 
 .container {

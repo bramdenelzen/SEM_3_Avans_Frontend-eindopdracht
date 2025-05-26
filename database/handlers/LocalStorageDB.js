@@ -1,4 +1,4 @@
-import DatabaseInterface from './DatabaseInterface.js';
+import DatabaseInterface from "./DatabaseInterface.js";
 
 export default class LocalStorageDB extends DatabaseInterface {
   constructor() {
@@ -19,7 +19,7 @@ export default class LocalStorageDB extends DatabaseInterface {
     const collection = this._getCollection(modelName);
     const newItem = {
       ...data,
-      id: Date.now() + Math.floor(Math.random() * 10000)
+      id: data.id ?? Date.now() + Math.floor(Math.random() * 10000),
     };
     collection.push(newItem);
     this._setCollection(modelName, collection);
@@ -30,14 +30,14 @@ export default class LocalStorageDB extends DatabaseInterface {
     const collection = this._getCollection(modelName);
     if (!query || Object.keys(query).length === 0) return collection;
 
-    return collection.filter(item =>
+    return collection.filter((item) =>
       Object.entries(query).every(([key, value]) => item[key] === value)
     );
   }
 
   async update(modelName, id, updates) {
     const collection = this._getCollection(modelName);
-    const index = collection.findIndex(item => item.id === id);
+    const index = collection.findIndex((item) => item.id === id);
     if (index === -1) return null;
 
     const updatedItem = { ...collection[index], ...updates, id };
@@ -49,7 +49,7 @@ export default class LocalStorageDB extends DatabaseInterface {
   async delete(modelName, id) {
     let collection = this._getCollection(modelName);
     const initialLength = collection.length;
-    collection = collection.filter(item => item.id !== id);
+    collection = collection.filter((item) => item.id !== id);
     this._setCollection(modelName, collection);
     return collection.length < initialLength;
   }

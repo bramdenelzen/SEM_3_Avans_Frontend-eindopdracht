@@ -12,11 +12,11 @@ export default class IngredientsSection extends WebComponent {
     this.ingredientListElement =
       this.shadowRoot.getElementById("ingredient-list");
 
-    const form = this.shadowRoot.querySelector("x-ingredientsform");
+    this.form = this.shadowRoot.querySelector("x-ingredientsform");
 
     this.seedList();
 
-    form.addEventListener("submitSucces", (event) => {
+    this.form.addEventListener("submitSucces", (event) => {
       const ingredient = event.detail.data;
 
       const ingredientListItemElement = document.createElement(
@@ -26,8 +26,12 @@ export default class IngredientsSection extends WebComponent {
 
       this.ingredientListElement.prepend(ingredientListItemElement);
 
-      form.hidePopover();
+      this.form.hidePopover();
     });
+  }
+
+  disconnectedCallback() {
+    this.form.removeEventListener("submitSucces", this.submitHandler);
   }
 
   async seedList() {

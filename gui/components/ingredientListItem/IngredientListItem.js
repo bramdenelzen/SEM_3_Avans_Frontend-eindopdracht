@@ -1,8 +1,8 @@
 import Ingredient from "../../../database/models/Ingredient.js";
+import Router from "../../../services/Router.js";
 import WebComponent from "../../Webcomponent.js";
 
 export default class IngredientListItem extends WebComponent {
-
   #ingredient;
 
   constructor() {
@@ -26,17 +26,28 @@ export default class IngredientListItem extends WebComponent {
     if (!(ingredient instanceof Ingredient)) {
       throw new Error("Ingredient must be of type ingredient");
     }
+
     this.#ingredient = ingredient;
+
+    this.render();
+  }
+
+  render() {
+    if (!this.#ingredient) {
+      throw new Error("Ingredient is not set");
+    }
+
     this.shadowRoot.getElementById("color-hexcode").innerText =
-      ingredient.colorHexcode;
+      this.#ingredient.colorHexcode;
     this.shadowRoot.getElementById("color").style.backgroundColor =
-      ingredient.colorHexcode;
-    this.shadowRoot.getElementById(
-      "min-mixing-time"
-    ).innerText = `${ingredient.minMixingTime} min`;
-    this.shadowRoot.getElementById(
-      "min-mixing-speed"
-    ).innerText = `${ingredient.minMixingSpeed} rpm`;
-    this.shadowRoot.getElementById("texture").innerText = ingredient.texture;
+      this.#ingredient.colorHexcode;
+    this.shadowRoot.getElementById("min-mixing-time").innerText = `${
+      this.#ingredient.minMixingTime
+    } min`;
+    this.shadowRoot.getElementById("min-mixing-speed").innerText = `${
+      this.#ingredient.minMixingSpeed
+    } rpm`;
+    this.shadowRoot.getElementById("texture").innerText =
+      this.#ingredient.texture;
   }
 }
