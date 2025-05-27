@@ -1,7 +1,7 @@
 
 export class Notification {
-  constructor(message, type = "info", displayTime = 4000) {
-    if (!['info','success','warning','error'].includes(type)) {
+  constructor(message, type, displayTime = 4000) {
+    if (!['info','success','warning','error', undefined].includes(type)) {
       throw new Error("Invalid notification type");
     }
     if (typeof displayTime !== 'number' || displayTime <= 0) {
@@ -11,6 +11,8 @@ export class Notification {
     this.message = message;
     this.type = type;
     this.displayTime = displayTime; 
+
+    Notifications.notify(this);
   }
 }
 

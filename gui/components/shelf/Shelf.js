@@ -1,6 +1,4 @@
-import Notifications, {
-  Notification,
-} from "../../../services/Notifications.js";
+import { Notification } from "../../../services/Notifications.js";
 import WebComponent from "../../Webcomponent.js";
 
 export default class Shelf extends WebComponent {
@@ -11,9 +9,7 @@ export default class Shelf extends WebComponent {
   connectedCallback() {
     let itteration = 0;
     this.shadowRoot.getElementById("test").addEventListener("click", () => {
-      Notifications.notify(
-        new Notification("Test Notification " + itteration++, "info")
-      );
+      new Notification("Test Notification " + itteration++, "info");
     });
   }
 }

@@ -16,8 +16,7 @@ export default class ToastList extends WebComponent {
     for (const notification of notifications) {
       const toastElement = document.createElement("x-toast");
       toastElement.message = notification.message;
-      toastElement.type = notification.type
-
+      toastElement.type = notification.type 
       list.appendChild(toastElement);
     }
   }

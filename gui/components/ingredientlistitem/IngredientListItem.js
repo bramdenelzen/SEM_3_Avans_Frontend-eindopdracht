@@ -1,4 +1,5 @@
 import Ingredient from "../../../database/models/Ingredient.js";
+import { Notification } from "../../../services/Notifications.js";
 import Router from "../../../services/Router.js";
 import WebComponent from "../../Webcomponent.js";
 
@@ -13,8 +14,16 @@ export default class IngredientListItem extends WebComponent {
     this.shadowRoot
       .getElementById("delete")
       .addEventListener("click", async () => {
-        await this.#ingredient.delete();
-        this.remove();
+        try {
+          throw new Error(
+            "This feature is not implemented yet. Please use the database to delete ingredients."
+          );
+          await this.#ingredient.delete();
+          this.remove();
+        } catch (error) {
+          new Notification(
+            "Failed to delete ingredient: " + error.message          );
+        }
       });
   }
 
@@ -42,7 +51,7 @@ export default class IngredientListItem extends WebComponent {
 
     const colorField = this.shadowRoot.getElementById("color");
     colorField.style.backgroundColor = this.#ingredient.colorHexcode;
-    colorField.classList.add("texture-"+this.#ingredient.texture)
+    colorField.classList.add("texture-" + this.#ingredient.texture);
     this.shadowRoot.getElementById("min-mixing-time").innerText = `${
       this.#ingredient.minMixingTime
     } min`;
