@@ -3,6 +3,7 @@ div {
   border-radius: var(--radius-md);
   color: var(--base-0);
   background-color: var(--base-900);
+  width: fit-content;
 
   &.error {
     background-color: var(--danger-color);

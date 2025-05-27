@@ -15,11 +15,12 @@ export default class IngredientListItem extends WebComponent {
       .getElementById("delete")
       .addEventListener("click", async () => {
         try {
-          throw new Error(
-            "This feature is not implemented yet. Please use the database to delete ingredients."
-          );
           await this.#ingredient.delete();
           this.remove();
+          new Notification(
+            "Ingredient deleted successfully",
+            "success"
+          );
         } catch (error) {
           new Notification(
             "Failed to delete ingredient: " + error.message          );

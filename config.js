@@ -24,7 +24,6 @@ export default {
       components: [
         "Button",
         "IngredientsSection",
-        "Header",
         "InputField",
         "IngredientsForm",
         "IngredientListItem",

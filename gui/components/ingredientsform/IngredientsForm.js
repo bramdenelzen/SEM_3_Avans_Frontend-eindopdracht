@@ -1,6 +1,6 @@
 import WebComponent from "../../Webcomponent.js";
 import Ingredient from "../../../database/models/Ingredient.js";
-
+import { Notification } from "../../../services/Notifications.js";
 
 export default class IngredientsForm extends WebComponent {
   constructor() {
@@ -34,10 +34,12 @@ export default class IngredientsForm extends WebComponent {
       });
 
       await ingredient.save();
+      
       this.dispatchEvent(
         new CustomEvent("submitSucces", { detail: { data: ingredient } })
       );
       this.formElement.reset();
+      new Notification("Ingredient created successfully", "success");
     } catch (error) {
       this.errorElement.innerText = `** ${error.message} **`;
     }

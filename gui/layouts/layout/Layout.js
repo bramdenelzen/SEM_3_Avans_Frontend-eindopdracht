@@ -1,4 +1,5 @@
 import MixingRoom from "../../../database/models/MixingRoom.js";
+import Router from "../../../services/Router.js";
 import WebComponent from "../../Webcomponent.js";
 
 export default class Layout extends WebComponent {
@@ -11,10 +12,21 @@ export default class Layout extends WebComponent {
 
     const nav = this.shadowRoot.querySelector("nav");
 
+    const currentPath = new Router().getCurrentPath();
+    console.log(currentPath);
+    if (currentPath === "/"){
+      this.shadowRoot.getElementById("home-link").classList.add("active");
+    }
+
     for (const mixingRoom of mixingRooms) {
       const mixingRoomLink = document.createElement("a");
       mixingRoomLink.href = `#/mixingroom/${mixingRoom.id}`;
       mixingRoomLink.innerText = mixingRoom.displayName;
+
+      if ("/mixingroom/" + mixingRoom.id === currentPath) {
+        mixingRoomLink.classList.add("active");
+      }
+
       nav.appendChild(mixingRoomLink);
     }
   }
