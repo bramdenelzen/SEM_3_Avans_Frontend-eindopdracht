@@ -28,6 +28,10 @@ export default {
         "InputField",
         "IngredientsForm",
         "IngredientListItem",
+        "Jar",
+        "Shelf",
+        "Toast",
+        "ToastList"
       ],
       pages: ["Home", "Error", "MixingRoom"],
       layouts: ["Layout"],

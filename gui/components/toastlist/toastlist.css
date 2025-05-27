@@ -1,0 +1,8 @@
+ul{
+    position: fixed;
+    bottom: 40px;
+    right:  40px;
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+}

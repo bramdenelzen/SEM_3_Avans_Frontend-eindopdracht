@@ -39,8 +39,10 @@ export default class IngredientListItem extends WebComponent {
 
     this.shadowRoot.getElementById("color-hexcode").innerText =
       this.#ingredient.colorHexcode;
-    this.shadowRoot.getElementById("color").style.backgroundColor =
-      this.#ingredient.colorHexcode;
+
+    const colorField = this.shadowRoot.getElementById("color");
+    colorField.style.backgroundColor = this.#ingredient.colorHexcode;
+    colorField.classList.add("texture-"+this.#ingredient.texture)
     this.shadowRoot.getElementById("min-mixing-time").innerText = `${
       this.#ingredient.minMixingTime
     } min`;

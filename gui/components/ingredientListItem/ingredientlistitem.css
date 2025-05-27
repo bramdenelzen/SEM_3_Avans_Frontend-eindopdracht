@@ -2,3 +2,55 @@
     width: 100%;
     height: 50px;
 }
+
+.texture-granular {
+  background-image: radial-gradient(
+    circle,
+    rgba(0, 0, 0, 0.3) 1px,
+    transparent 1px
+  );
+  background-size: 6px 6px;
+}
+
+/* Coarse structure - larger irregular shapes */
+.texture-coarse {
+  background-image: radial-gradient(
+      circle at 25% 30%,
+      rgba(0, 0, 0, 0.4) 4px,
+      transparent 6px
+    ),
+    radial-gradient(circle at 75% 65%, rgba(0, 0, 0, 0.4) 5px, transparent 7px),
+    radial-gradient(circle at 45% 55%, rgba(0, 0, 0, 0.4) 3px, transparent 5px),
+    radial-gradient(circle at 65% 25%, rgba(0, 0, 0, 0.4) 6px, transparent 8px);
+  background-size: 20px 20px;
+}
+
+/* Smooth structure - gradient background */
+.texture-smooth {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(240, 240, 240, 0.3) 50%,
+    rgba(230, 230, 230, 0.8) 100%
+  );
+}
+
+/* Slimy structure - wavy lines pattern */
+.texture-slimy {
+  position: relative;
+  background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 4px,
+      rgba(0, 200, 100, 0.2) 4px,
+      rgba(0, 200, 100, 0.2) 8px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 5px,
+      rgba(0, 200, 100, 0.1) 5px,
+      rgba(0, 200, 100, 0.1) 10px
+    ),
+    white;
+}

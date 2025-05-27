@@ -1,0 +1,17 @@
+div {
+  padding: 10px;
+  border-radius: var(--radius-md);
+
+  &.error {
+    background-color: var(--danger-color);
+  }
+  &.success {
+    background-color: var(--success-color);
+  }
+  &.info {
+    background-color: var(--primary-color);
+  }
+  &.warning {
+    background-color: var(--warning-color);
+  }
+}
