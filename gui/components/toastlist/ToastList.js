@@ -1,18 +1,25 @@
-import { notifications } from "../../../services/State.js";
+import Notifications from "../../../services/Notifications.js"
 import WebComponent from "../../Webcomponent.js";
 
 export default class ToastList extends WebComponent {
   constructor() {
     super(ToastList.html, ToastList.css);
-
-    notifications.onChange(this._manageToasts.bind(this));
+    Notifications.onChange(this._manageToasts.bind(this));
   }
 
-  _manageToasts(toasts) {
+  /**
+   * 
+   * @param {[Notification]} notification 
+   */
+  _manageToasts(notifications) {
     const list = this.shadowRoot.querySelector("ul");
     list.innerHTML = "";
-    for (const toast of toasts) {
-      list.appendChild(toast);
+    for (const notification of notifications) {
+      const toastElement = document.createElement("x-toast");
+      toastElement.message = notification.message;
+      toastElement.type = notification.type || "info"; // Default to "info" if no type is provided
+
+      list.appendChild(toastElement);
     }
   }
 }

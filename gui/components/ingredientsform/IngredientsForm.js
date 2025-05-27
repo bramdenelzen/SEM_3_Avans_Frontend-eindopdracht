@@ -1,6 +1,7 @@
 import WebComponent from "../../Webcomponent.js";
 import Ingredient from "../../../database/models/Ingredient.js";
 
+
 export default class IngredientsForm extends WebComponent {
   constructor() {
     super(IngredientsForm.html, IngredientsForm.css);
@@ -38,11 +39,7 @@ export default class IngredientsForm extends WebComponent {
       );
       this.formElement.reset();
     } catch (error) {
-      console.log(Number(undefined));
-      console.log(error.message);
       this.errorElement.innerText = `** ${error.message} **`;
     }
-
-    console.log(formData);
   }
 }

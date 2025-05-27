@@ -1,4 +1,3 @@
-import { notifications } from "../../../services/State.js";
 import WebComponent from "../../Webcomponent.js";
 
 export default class Toast extends WebComponent {
