@@ -9,8 +9,8 @@ export class Notification {
     }
 
     this.message = message;
-    this.type = type; // 'info', 'success', 'warning', 'error'
-    this.displayTime = displayTime; // Time in milliseconds to display the notification
+    this.type = type;
+    this.displayTime = displayTime; 
   }
 }
 
@@ -19,7 +19,6 @@ export default class Notifications {
   static callbacks = [];
 
   /**
-   * 
    * @param {Notification} notification 
    */
   static notify(notification) {
@@ -27,7 +26,7 @@ export default class Notifications {
       throw new Error("Notification must be an instance of Notification class");
     }
     if (this.notifications.length >= 5) {
-      this.notifications.shift(); // Remove the oldest notification if limit is reached
+      this.notifications.shift(); 
     }
     this.notifications.push(notification);
     this.callbacks.forEach((callback) => callback(this.notifications));
