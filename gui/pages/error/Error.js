@@ -17,7 +17,6 @@ export default class Error extends WebComponent{
             messageElement.innerText = "An error occurred";
             statusElement.innerText = "500";
         }else {
-            document.title = `${this.status} ${this.message}`
             messageElement.innerText = this.message;
             statusElement.innerText = this.status;
         }

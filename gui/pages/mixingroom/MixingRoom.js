@@ -9,20 +9,14 @@ export default class MixingRoom extends WebComponent {
 
   async connectedCallback() {
     const { mixingroomId } = new Router().getParams();
-
-    console.log(mixingroomId);
-
     const mixingRoomRecord = await MixingRoomModel.findById(
       Number(mixingroomId)
     );
-    console.log(mixingRoomRecord);
 
     if (!mixingRoomRecord) {
       this.shadowRoot.innerHTML = `<x-error status="404" message="Not found"></x-error>`;
       return;
     }
-
-    console.log(mixingRoomRecord);
 
     this.nameElement = this.shadowRoot.getElementById("name");
 
