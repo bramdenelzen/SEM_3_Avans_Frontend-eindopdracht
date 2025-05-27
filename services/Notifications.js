@@ -1,6 +1,13 @@
 
 export class Notification {
   constructor(message, type = "info", displayTime = 4000) {
+    if (!['info','success','warning','error'].includes(type)) {
+      throw new Error("Invalid notification type");
+    }
+    if (typeof displayTime !== 'number' || displayTime <= 0) {
+      throw new Error("Display time must be a positive number");
+    }
+
     this.message = message;
     this.type = type; // 'info', 'success', 'warning', 'error'
     this.displayTime = displayTime; // Time in milliseconds to display the notification
@@ -16,6 +23,12 @@ export default class Notifications {
    * @param {Notification} notification 
    */
   static notify(notification) {
+    if (!(notification instanceof Notification)) {
+      throw new Error("Notification must be an instance of Notification class");
+    }
+    if (this.notifications.length >= 5) {
+      this.notifications.shift(); // Remove the oldest notification if limit is reached
+    }
     this.notifications.push(notification);
     this.callbacks.forEach((callback) => callback(this.notifications));
 
@@ -28,6 +41,4 @@ export default class Notifications {
   static onChange(callback) {
     this.callbacks.push(callback);
   }
-
-
 }
