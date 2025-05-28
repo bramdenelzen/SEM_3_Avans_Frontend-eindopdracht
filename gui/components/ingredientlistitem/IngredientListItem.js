@@ -1,6 +1,5 @@
 import Ingredient from "../../../database/models/Ingredient.js";
 import { Notification } from "../../../services/Notifications.js";
-import Router from "../../../services/Router.js";
 import WebComponent from "../../Webcomponent.js";
 
 export default class IngredientListItem extends WebComponent {
@@ -9,29 +8,19 @@ export default class IngredientListItem extends WebComponent {
   constructor() {
     super(IngredientListItem.html, IngredientListItem.css);
 
-    this.shadowRoot.draggable = true;
-  }
-
-  connectedCallback() {
     this.shadowRoot
-      .getElementById("delete")
-      .addEventListener("click", async () => {
-        try {
-          await this.#ingredient.delete();
-          this.remove();
-          new Notification(
-            "Ingredient deleted successfully",
-            "success"
-          );
-        } catch (error) {
-          new Notification(
-            "Failed to delete ingredient: " + error.message          );
-        }
+      .querySelector("div")
+      .addEventListener("dragstart", (event) => {
+        event.dataTransfer.setData(
+          "text/plain",
+          JSON.stringify({
+            ingredientId: this.#ingredient.id,
+          })
+        );
       });
   }
 
   /**
-   * @type {Ingredient}
    * @param {Ingredient} ingredient
    */
   set ingredient(ingredient) {

@@ -2,13 +2,25 @@ import WebComponent from "../../Webcomponent.js";
 import IngredientModel from "../../../database/models/Ingredient.js";
 import IngredientListItem from "../ingredientListItem/IngredientListItem.js";
 import Ingredient from "../../../database/models/Ingredient.js";
+import MixingRoom from "../../../database/models/MixingRoom.js";
+import Router from "../../../services/Router.js";
 
 export default class IngredientsSection extends WebComponent {
   constructor() {
     super(IngredientsSection.html, IngredientsSection.css);
   }
 
-  connectedCallback() {
+  async connectedCallback() {
+    const addButton = this.shadowRoot.getElementById("add-ingredient");
+
+    const { mixingroomId } = new Router().getParams();
+
+    const mixingroom = await MixingRoom.find({});
+
+    if (mixingroom[0].id == Number(mixingroomId)) {
+      addButton.remove()
+    }
+
     this.ingredientListElement =
       this.shadowRoot.getElementById("ingredient-list");
 

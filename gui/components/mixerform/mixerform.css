@@ -1,0 +1,71 @@
+.main-container {
+  background-color: var(--base-0);
+  padding: 1.5rem 1rem;
+  border-radius: var(--radius-md);
+  min-width: 400px;
+}
+
+h2 {
+  font-size: 1.5rem;
+  color: var(--base-900);
+  margin-bottom: 1rem;
+  font-weight: semi-bold;
+}
+
+#error {
+  color: var(--danger-color);
+  font-size: 0.8rem;
+}
+
+form{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+button[type="submit"]{
+  margin-top:20px
+}
+
+.inputfield {
+  display: flex;
+  flex-direction: column;
+
+  & label {
+    font-size: 0.8rem;
+    color: var(--base-700);
+    margin-bottom: 6px;
+  }
+
+  &:has(input:required) > label::after,
+  &:has(textarea:required) > label::after,
+  &:has(input[type="color"]) > label::after,
+  &:has(select:required) > label::after {
+    content: "*";
+    color: var(--danger-color);
+    margin-left: 6px;
+  }
+
+  & input,
+  select {
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    border: 1px solid var(--base-300);
+    border-radius: var(--radius-md);
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+
+    &::placeholder {
+      font-size: 0.8rem;
+    }
+    &:focus {
+      border-color: var(--primary-color);
+      outline: none;
+    }
+  }
+
+  & input[type="color"]{
+    padding:0;
+  }
+}

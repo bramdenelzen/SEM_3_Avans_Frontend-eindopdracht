@@ -17,9 +17,5 @@ export default class MixingRoom extends WebComponent {
       this.shadowRoot.innerHTML = `<x-error status="404" message="Not found"></x-error>`;
       return;
     }
-
-    this.nameElement = this.shadowRoot.getElementById("name");
-
-    this.nameElement.innerText = "Mixingroom: " + mixingroomId;
   }
 }

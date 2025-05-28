@@ -1,10 +1,23 @@
 .main-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  padding-top: var(--section-padding-md);
+  gap: 30px;
 
   > div {
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    background-color: var(--base-100);
+    height: max-content;
+
+    > * {
+        background-color: var(--base-0);
+    }
   }
+}
+
+
+.span-full{
+    grid-column: 1/ -1;
 }

@@ -30,7 +30,10 @@ export default {
         "Jar",
         "Shelf",
         "Toast",
-        "ToastList"
+        "ToastList",
+        "JarsSection",
+        "MixerSection",
+        "MixerForm"
       ],
       pages: ["Home", "Error", "MixingRoom"],
       layouts: ["Layout"],
