@@ -27,6 +27,7 @@ export default class JarsSection extends WebComponent {
       jarElement.jar = jar;
 
       this.jarListElement.prepend(jarElement);
+      new Notification("Jar created successfully", "success");
     });
   }
 
