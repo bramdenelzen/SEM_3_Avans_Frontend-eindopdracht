@@ -41,13 +41,19 @@
   --screen-sm: 576px;
   --screen-xs: 480px;
 
+  --section-padding-sm: 20px;
+  --section-padding-md: 30px;
+  --section-padding-lg: 40px;
+  --section-padding-xl: 50px;
+  --section-padding-xxl: 60px;
+
   --radius-sm: 0.2rem;
   --radius-md: 0.25rem;
   --radius-lg: 0.3rem;
 }
 
 * {
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-family: sans-serif;
   font-size: 1rem;
   line-height: 1.5;
   margin: 0;
@@ -94,23 +100,21 @@
   padding-right: 15px;
   width: 100%;
 
-
-&.xxl {
-  max-width: var(--screen-xxl);
-}
-&.xl {
-  max-width: var(--screen-xl);
-}
-&.lg {
-  max-width: var(--screen-lg);
-}
-&.md {
-  max-width: var(--screen-md);
-}
-&.sm {
-  max-width: var(--screen-sm);
-}
-
+  &.xxl {
+    max-width: var(--screen-xxl);
+  }
+  &.xl {
+    max-width: var(--screen-xl);
+  }
+  &.lg {
+    max-width: var(--screen-lg);
+  }
+  &.md {
+    max-width: var(--screen-md);
+  }
+  &.sm {
+    max-width: var(--screen-sm);
+  }
 }
 
 .section-padding {
@@ -160,4 +164,32 @@
   &::backdrop {
     background-color: rgba(0, 0, 0, 0.5);
   }
+}
+
+h1 {
+  font-size: 4.236rem; /* ~67.8px */
+  font-weight: bold;
+  margin-bottom: 2.618rem;
+  color: var(--base-900);
+}
+
+h2 {
+  font-size: 2.618rem; /* ~41.9px */
+  font-weight: bold;
+  margin-bottom: 1.618rem;
+  color: var(--base-800);
+}
+
+h3 {
+  font-size: 1.618rem; /* ~25.9px */
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: var(--base-700);
+}
+
+p {
+  font-size: 1rem; /* 16px */
+  line-height: 1.618;
+  margin-bottom: 1rem;
+  color: var(--base-600);
 }

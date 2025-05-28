@@ -1,0 +1,21 @@
+ul {
+  display: flex;
+  gap: 10px;
+  overflow-x: scroll;
+  padding-bottom: 20px;
+}
+
+x-ingredientlistitem {
+  min-width: 150px;
+}
+
+.header {
+  margin-bottom: 25.888px;
+  display: flex;
+  align-items:center;
+  gap: 20px;
+
+  > h2 {
+    margin-bottom: 0;
+  }
+}

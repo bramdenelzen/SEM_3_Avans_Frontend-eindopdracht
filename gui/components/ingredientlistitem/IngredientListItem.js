@@ -8,6 +8,8 @@ export default class IngredientListItem extends WebComponent {
 
   constructor() {
     super(IngredientListItem.html, IngredientListItem.css);
+
+    this.shadowRoot.draggable = true;
   }
 
   connectedCallback() {
