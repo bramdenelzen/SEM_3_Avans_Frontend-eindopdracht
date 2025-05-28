@@ -11,7 +11,7 @@ export default class Jar extends WebComponent {
 
   #jar = null;
 
-  #mixingSpeed = null;
+  #minMixingSpeed = null;
 
   constructor() {
     super(Jar.html, Jar.css);
@@ -41,10 +41,12 @@ export default class Jar extends WebComponent {
       throw new Error("Jar is full, cannot add more ingredients");
     }
 
+    if (this.#minMixingSpeed === null) {
+      this.#minMixingSpeed = ingredient.minMixingSpeed;
+    }
+
     this.#ingredients.push(ingredient);
-    console.log(
-      `Adding ingredient ${ingredient.id} to jar ${this.#jar.id}`
-    );
+    console.log(`Adding ingredient ${ingredient.id} to jar ${this.#jar.id}`);
     this.updateLayers();
   }
 
@@ -97,6 +99,7 @@ export default class Jar extends WebComponent {
       }
 
       const ingredientData = JSON.parse(dataJSON);
+      
       if (!ingredientData || !ingredientData.ingredientId) {
         throw new Error("Invalid ingredient data in drop event");
       }
@@ -116,6 +119,10 @@ export default class Jar extends WebComponent {
         throw new Error("Jar is full, cannot add more ingredients");
       }
 
+      if (this.#minMixingSpeed !== null && ingredient.minMixingSpeed != this.#minMixingSpeed) {
+        throw new Error("Mixing speeds differ, jars mixing speed is: " + this.#minMixingSpeed);
+      }
+
       const jarIngredient = new JarHasIngredient({
         jarId: this.#jar.id,
         ingredientId: ingredient.id,
@@ -124,7 +131,6 @@ export default class Jar extends WebComponent {
       await jarIngredient.save();
 
       this._addIngredient(ingredient);
-
     } catch (error) {
       console.error("Error handling drop event:", error);
       new Notification(error.message, "error");
