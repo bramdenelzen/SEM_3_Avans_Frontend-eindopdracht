@@ -14,7 +14,6 @@ export default class JarsSection extends WebComponent {
 
     const addButton = this.shadowRoot.getElementById("add-jar");
 
-    this.seedList();
     addButton.addEventListener("click", async () => {
       const jar = new Jar({
         name: "new Jar",

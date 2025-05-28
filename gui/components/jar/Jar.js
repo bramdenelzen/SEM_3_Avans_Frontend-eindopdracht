@@ -11,6 +11,8 @@ export default class Jar extends WebComponent {
 
   #jar = null;
 
+  #mixingSpeed = null;
+
   constructor() {
     super(Jar.html, Jar.css);
 
@@ -31,22 +33,34 @@ export default class Jar extends WebComponent {
     this.__getIngredients();
   }
 
+  _addIngredient(ingredient) {
+    if (!(ingredient instanceof Ingredient)) {
+      throw new Error("Ingredient must be of type Ingredient");
+    }
+    if (this.#ingredients.length >= 3) {
+      throw new Error("Jar is full, cannot add more ingredients");
+    }
+
+    this.#ingredients.push(ingredient);
+    console.log(
+      `Adding ingredient ${ingredient.id} to jar ${this.#jar.id}`
+    );
+    this.updateLayers();
+  }
+
   async __getIngredients() {
     const ingredients = await JarHasIngredient.find({ jarId: this.#jar.id });
-    if (ingredients.length > 3) {
-      await ingredients[0].delete();
-    }
+
     for (const jarIngredient of ingredients) {
       const ingredient = await Ingredient.findById(jarIngredient.ingredientId);
       if (ingredient) {
-        this.#ingredients.push(ingredient);
+        this._addIngredient(ingredient);
       } else {
         console.error(
           `Ingredient with ID ${jarIngredient.ingredientId} not found`
         );
       }
     }
-    this.updateLayers();
   }
 
   connectedCallback() {
@@ -109,9 +123,8 @@ export default class Jar extends WebComponent {
 
       await jarIngredient.save();
 
-      this.#ingredients.push(ingredient);
+      this._addIngredient(ingredient);
 
-      this.updateLayers();
     } catch (error) {
       console.error("Error handling drop event:", error);
       new Notification(error.message, "error");

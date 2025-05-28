@@ -5,7 +5,7 @@ import MixingRoom from "../models/MixingRoom.js";
 export default class MixingRoomSeeder extends BaseSeeder {
   static async run() {
     let mixingRooms = await MixingRoom.find({});
-    const totalMixingRooms = 3;
+    const totalMixingRooms = 2;
 
     if (mixingRooms.length < totalMixingRooms) {
       const roomsToAdd = totalMixingRooms - mixingRooms.length;

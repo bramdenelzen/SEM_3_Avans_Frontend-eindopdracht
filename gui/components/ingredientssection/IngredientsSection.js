@@ -17,7 +17,7 @@ export default class IngredientsSection extends WebComponent {
 
     const mixingroom = await MixingRoom.find({});
 
-    if (mixingroom[0].id == Number(mixingroomId)) {
+    if (mixingroom[0].id != Number(mixingroomId)) {
       addButton.remove()
     }
 
