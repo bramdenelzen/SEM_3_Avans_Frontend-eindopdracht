@@ -21,11 +21,42 @@ export default class Jar extends WebComponent {
     this.#layers.push(this.shadowRoot.getElementById("layer-2"));
     this.#layers.push(this.shadowRoot.getElementById("layer-1"));
 
-    window.addEventListener("jarDeleted", (event) => {
-      const { jarId } = event.detail;
-      if (this.#jar && this.#jar.id === jarId) {
+    window.addEventListener("mixing-started", async (event) => {
+      try {
+        const { jarId } = event.detail;
+        if (this.#jar.id !== jarId) {
+          return;
+        }
         this.remove();
+      } catch (error) {
+        console.error(`Error handling jarChanged event: ${error.message}`);
       }
+    });
+
+    window.addEventListener("mixing-success", async (event) => {
+      const { jarId, resultColor } = event.detail;
+
+      console.log("mixing-success event received", jarId, resultColor);
+      if (this.#jar.id !== jarId) {
+        return;
+      }
+
+      console.log("mixing-success", this.#jar, resultColor);
+
+      await this.#jar.delete();
+
+      const jarIngredients = await JarHasIngredient.find({
+        jarId: jarId,
+      });
+
+      console.log("jarIngredients", jarIngredients);
+
+      jarIngredients.map(async (ingredient) => {
+        const deleted = await ingredient.delete();
+        if (!deleted) {
+          throw new Error(`Ingredient ${ingredient.name} could not be deleted`);
+        }
+      });
     });
   }
 

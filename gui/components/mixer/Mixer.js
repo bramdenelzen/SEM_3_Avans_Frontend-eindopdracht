@@ -2,9 +2,13 @@ import WebComponent from "../../Webcomponent.js";
 import MixerModel from "../../../database/models/Mixer.js";
 import { Notification } from "../../../services/Notifications.js";
 import Jar from "../../../database/models/Jar.js";
+import ResultColor from "../../../database/models/ResultColor.js";
 
 export default class Mixer extends WebComponent {
   #mixer;
+
+  #isMixing = false;
+
   constructor() {
     super(Mixer.html, Mixer.css);
   }
@@ -41,6 +45,11 @@ export default class Mixer extends WebComponent {
         event.dataTransfer.getData("text/plain")
       );
 
+      if (this.#isMixing) {
+        new Notification("Mixer is already mixing", "error");
+        return;
+      }
+
       if (!dropEventJSON) {
         throw new Error("Something went wrong with the drop event");
       } else if (!dropEventJSON.jar) {
@@ -58,27 +67,89 @@ export default class Mixer extends WebComponent {
         throw new Error("Jar is empty, please add ingredients before mixing");
       }
 
-      console.log("dropEventJSON", dropEventJSON);
-
-      const jar = await Jar.findById(dropEventJSON.jar.id);
-      if (!jar) {
-        throw new Error("Jar not found");
-      }
-
-      const deleted = await jar.delete();
-      if (!deleted) {
-        throw new Error("Failed to delete jar");
-      }
-
-      window.dispatchEvent(
-        new CustomEvent("jarDeleted", {
-          detail: { jarId: jar.id },
-        })
-      );
+      await this._mix(dropEventJSON);
     } catch (error) {
       new Notification(error.message, "error");
     }
   }
 
-  _mix() {}
+  /**
+   *
+   * @param {{
+   * id: number,
+   * colorHexcode: string,
+   * minMixingSpeed: number,
+   * minMixingTime: number,
+   * }} ingredients
+   */
+  async _mix(dropEventJSON) {
+    try {
+      window.dispatchEvent(
+        new CustomEvent("mixing-started", {
+          detail: { jarId: dropEventJSON.jar.id },
+        })
+      );
+      this.#isMixing = true;
+
+      let totalR = 0,
+        totalG = 0,
+        totalB = 0;
+
+      dropEventJSON.jar.ingredients
+        .map((i) => i.colorHexcode)
+        .forEach((hex) => {
+          // Remove "#" if present
+          hex = hex.replace(/^#/, "");
+
+          // Parse R, G, B
+          const r = parseInt(hex.substring(0, 2), 16);
+          const g = parseInt(hex.substring(2, 4), 16);
+          const b = parseInt(hex.substring(4, 6), 16);
+
+          totalR += r;
+          totalG += g;
+          totalB += b;
+        });
+
+      const count = dropEventJSON.jar.ingredients.length;
+      const avgR = Math.round(totalR / count);
+      const avgG = Math.round(totalG / count);
+      const avgB = Math.round(totalB / count);
+
+      // Convert back to hex with padding
+      const toHex = (val) => val.toString(16).padStart(2, "0");
+
+      const endResult = `#${toHex(avgR)}${toHex(avgG)}${toHex(avgB)}`;
+
+      const resultDbRecord = new ResultColor({ colorHexcode: endResult });
+      await resultDbRecord.save();
+
+      if (!resultDbRecord.id) {
+        throw new Error(
+          "Failed to save the result color in the database"
+        );
+      }
+
+      await new Promise((resolve) =>
+        setTimeout(async () => {
+          resolve();
+        }, dropEventJSON.jar.mixingTime * 100)
+      );
+
+      this.#isMixing = false;
+      window.dispatchEvent(
+        new CustomEvent("mixing-success", {
+          detail: { jarId: dropEventJSON.jar.id },
+        })
+      );
+      new Notification("Mixer finished mixing", "success");
+    } catch (error) {
+      window.dispatchEvent(
+        new CustomEvent("mixing-failed", {
+          detail: { jarId: dropEventJSON.jar.id },
+        })
+      );
+      throw new Error(`Something went wrong while mixing: ${error.message}`);
+    }
+  }
 }
