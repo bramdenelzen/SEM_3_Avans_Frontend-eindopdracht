@@ -33,6 +33,21 @@ export default class Jar extends WebComponent {
     this.__getIngredients();
   }
 
+  async __getIngredients() {
+    const ingredients = await JarHasIngredient.find({ jarId: this.#jar.id });
+
+    for (const jarIngredient of ingredients) {
+      const ingredient = await Ingredient.findById(jarIngredient.ingredientId);
+      if (ingredient) {
+        this._addIngredient(ingredient);
+      } else {
+        console.error(
+          `Ingredient with ID ${jarIngredient.ingredientId} not found`
+        );
+      }
+    }
+  }
+
   _addIngredient(ingredient) {
     if (!(ingredient instanceof Ingredient)) {
       throw new Error("Ingredient must be of type Ingredient");
@@ -48,21 +63,6 @@ export default class Jar extends WebComponent {
     this.#ingredients.push(ingredient);
     console.log(`Adding ingredient ${ingredient.id} to jar ${this.#jar.id}`);
     this.updateLayers();
-  }
-
-  async __getIngredients() {
-    const ingredients = await JarHasIngredient.find({ jarId: this.#jar.id });
-
-    for (const jarIngredient of ingredients) {
-      const ingredient = await Ingredient.findById(jarIngredient.ingredientId);
-      if (ingredient) {
-        this._addIngredient(ingredient);
-      } else {
-        console.error(
-          `Ingredient with ID ${jarIngredient.ingredientId} not found`
-        );
-      }
-    }
   }
 
   connectedCallback() {
@@ -84,43 +84,37 @@ export default class Jar extends WebComponent {
     );
   }
 
-  _dragoverHandler(event) {
-    event.preventDefault();
-  }
-
   async _dropHandler(event) {
     event.preventDefault();
 
     try {
-      const dataJSON = event.dataTransfer.getData("text/plain");
+      const dropEventJSON = JSON.parse(
+        event.dataTransfer.getData("text/plain")
+      );
 
-      if (!dataJSON) {
-        throw new Error("No ingredient ID found in drop event");
-      }
-
-      const ingredientData = JSON.parse(dataJSON);
-      
-      if (!ingredientData || !ingredientData.ingredientId) {
+      if (!dropEventJSON || !dropEventJSON.ingredientId) {
         throw new Error("Invalid ingredient data in drop event");
       }
 
-      const ingredientId = ingredientData.ingredientId;
+      const ingredientId = dropEventJSON.ingredientId;
+
       const ingredient = await Ingredient.findById(ingredientId);
 
       if (!ingredient) {
         throw new Error(`Ingredient with ID ${ingredientId} not found`);
       }
 
-      const jarIngredients = await JarHasIngredient.find({
-        jarId: this.#jar.id,
-      });
-
-      if (jarIngredients.length >= 3) {
+      if (this.#ingredients.length >= 3) {
         throw new Error("Jar is full, cannot add more ingredients");
       }
 
-      if (this.#minMixingSpeed !== null && ingredient.minMixingSpeed != this.#minMixingSpeed) {
-        throw new Error("Mixing speeds differ, jars mixing speed is: " + this.#minMixingSpeed);
+      if (
+        this.#minMixingSpeed !== null &&
+        ingredient.minMixingSpeed != this.#minMixingSpeed
+      ) {
+        throw new Error(
+          "Mixing speeds differ, jars mixing speed is: " + this.#minMixingSpeed
+        );
       }
 
       const jarIngredient = new JarHasIngredient({
@@ -144,5 +138,9 @@ export default class Jar extends WebComponent {
         this.#ingredients[index]?.colorHexcode || "#ffffff"
       );
     });
+  }
+
+  _dragoverHandler(event) {
+    event.preventDefault();
   }
 }

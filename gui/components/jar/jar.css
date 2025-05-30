@@ -1,5 +1,12 @@
 svg {
   height: 100%;
-  /* width: fit-content; Or 100% depending on your use case */
   display: block;
+}
+
+.jar {
+    height: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    /* display: block; */
 }

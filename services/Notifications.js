@@ -30,9 +30,9 @@ export default class Notifications {
       this.notifications.shift();
       this.notifications.push(notification);
       this.callbacks.forEach((callback) => callback(this.notifications));
-
       return;
     }
+    
     this.notifications.push(notification);
     this.callbacks.forEach((callback) => callback(this.notifications));
 

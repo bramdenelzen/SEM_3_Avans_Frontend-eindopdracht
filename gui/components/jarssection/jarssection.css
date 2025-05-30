@@ -14,8 +14,8 @@ section {
 }
 
 ul {
-    height: 150px;
+    height: 180px;
     display: flex;
     gap: 10px;
-    overflow: scroll;
+    overflow-y: scroll;
 }
