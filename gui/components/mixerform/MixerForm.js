@@ -36,7 +36,6 @@ export default class MixerForm extends WebComponent {
         throw new Error("You can only have 5 mixers per mixing room");
       }
       const mixer = new Mixer({
-        mixingTime: Number(formData.get("mixingTime")),
         mixingSpeed: Number(formData.get("mixingSpeed")),
         mixingroomId: Number(mixingroomId),
       });

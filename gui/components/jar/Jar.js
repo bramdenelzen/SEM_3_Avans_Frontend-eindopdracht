@@ -11,7 +11,7 @@ export default class Jar extends WebComponent {
 
   #jar = null;
 
-  #minMixingSpeed = null;
+  #mixingSpeed = null;
   #minMixingTime = null;
 
   constructor() {
@@ -20,6 +20,13 @@ export default class Jar extends WebComponent {
     this.#layers.push(this.shadowRoot.getElementById("layer-3"));
     this.#layers.push(this.shadowRoot.getElementById("layer-2"));
     this.#layers.push(this.shadowRoot.getElementById("layer-1"));
+
+    window.addEventListener("jarDeleted", (event) => {
+      const { jarId } = event.detail;
+      if (this.#jar && this.#jar.id === jarId) {
+        this.remove();
+      }
+    });
   }
 
   /**
@@ -29,14 +36,14 @@ export default class Jar extends WebComponent {
     if (!(jar instanceof JarModel)) {
       throw new Error("Jar must be of type Jar");
     }
-    this.#jar = jar;
 
+    this.#jar = jar;
     this.__getIngredients();
   }
 
   async __getIngredients() {
     const ingredients = await JarHasIngredient.find({ jarId: this.#jar.id });
-
+    console.log("ingredients", ingredients);
     for (const jarIngredient of ingredients) {
       const ingredient = await Ingredient.findById(jarIngredient.ingredientId);
       if (ingredient) {
@@ -57,8 +64,8 @@ export default class Jar extends WebComponent {
       throw new Error("Jar is full, cannot add more ingredients");
     }
 
-    if (this.#minMixingSpeed === null) {
-      this.#minMixingSpeed = ingredient.minMixingSpeed;
+    if (this.#mixingSpeed === null) {
+      this.#mixingSpeed = ingredient.minMixingSpeed;
     }
 
     this.#ingredients.push(ingredient);
@@ -76,8 +83,10 @@ export default class Jar extends WebComponent {
   }
 
   connectedCallback() {
-    this.shadowRoot.addEventListener("drop", this._dropHandler.bind(this));
+    this.draggable = true;
+    this.addEventListener("dragstart", this._dragstartHandler.bind(this));
 
+    this.shadowRoot.addEventListener("drop", this._dropHandler.bind(this));
     this.shadowRoot.addEventListener(
       "dragover",
       this._dragoverHandler.bind(this)
@@ -87,11 +96,36 @@ export default class Jar extends WebComponent {
   }
 
   disconnectedCallback() {
+    this.removeEventListener("dragstart", this._dragstartHandler.bind(this));
     this.shadowRoot.removeEventListener("drop", this._dropHandler.bind(this));
     this.shadowRoot.removeEventListener(
       "dragover",
       this._dragoverHandler.bind(this)
     );
+  }
+
+  async _dragstartHandler(event) {
+    event.dataTransfer.setData(
+      "text/plain",
+      JSON.stringify({
+        jar: {
+          id: this.#jar.id,
+          ingredients: this.#ingredients.map((ing) => {
+            return {
+              id: ing.id,
+              name: ing.name,
+              colorHexcode: ing.colorHexcode,
+              minMixingSpeed: ing.minMixingSpeed,
+              minMixingTime: ing.minMixingTime,
+            };
+          }),
+          mixingSpeed: this.#mixingSpeed,
+          mixingTime: this.#minMixingTime,
+        },
+      })
+    );
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.dropEffect = "move";
   }
 
   async _dropHandler(event) {
@@ -119,11 +153,11 @@ export default class Jar extends WebComponent {
       }
 
       if (
-        this.#minMixingSpeed !== null &&
-        ingredient.minMixingSpeed != this.#minMixingSpeed
+        this.#mixingSpeed !== null &&
+        ingredient.minMixingSpeed != this.#mixingSpeed
       ) {
         throw new Error(
-          "Mixing speeds differ, jars mixing speed is: " + this.#minMixingSpeed
+          "Mixing speeds differ, jars mixing speed is: " + this.#mixingSpeed
         );
       }
 
@@ -145,8 +179,8 @@ export default class Jar extends WebComponent {
     const mixingSpeed = this.shadowRoot.getElementById("mixing-speed");
     const minMixingTime = this.shadowRoot.getElementById("min-mixing-time");
 
-    mixingSpeed.innerText = this.#minMixingSpeed
-      ? `Mixing Speed: ${this.#minMixingSpeed}`
+    mixingSpeed.innerText = this.#mixingSpeed
+      ? `Mixing Speed: ${this.#mixingSpeed} RPM`
       : "";
 
     minMixingTime.innerText = `Min mixing Time: ${this.#minMixingTime} sec`;
