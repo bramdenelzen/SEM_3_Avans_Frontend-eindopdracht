@@ -4,12 +4,16 @@ export default class Mixer extends BaseModel {
   static modelName = "mixer";
 
   static schema = {
-    test: {
-      type: "string",
+    mixingTime: {
+      type: "number",
       required: true,
     },
-    mixingRoomId: {
-      type: "string",
+    mixingSpeed: {
+      type: "number",
+      required: true,
+    },
+    mixingroomId: {
+      type: "number",
       required: true,
     },
   };
@@ -21,17 +25,19 @@ export default class Mixer extends BaseModel {
    * @param {string} colorCode
    * @param {string} texture
    */
-  constructor(colorOrData) {
+  constructor(mixingTimeOrData, mixingSpeed, mixingroomId) {
     // Support both `new User({ id, name, age })` and `new User(name, age)`
     let data;
-    if (typeof colorOrData === "object") {
-      data = colorOrData;
+    if (typeof mixingTimeOrData === "object") {
+      data = mixingTimeOrData;
     } else {
       data = {
-        color: colorOrData,
+        mixingTime: mixingTimeOrData,
+        mixingSpeed: mixingSpeed,
+        mixingroomId: mixingroomId, 
       };
     }
 
-    super(MixingRoom.modelName, data, MixingRoom.schema);
+    super(Mixer.modelName, data, Mixer.schema);
   }
 }

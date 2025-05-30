@@ -4,6 +4,7 @@ import IngredientListItem from "../ingredientListItem/IngredientListItem.js";
 import Ingredient from "../../../database/models/Ingredient.js";
 import MixingRoom from "../../../database/models/MixingRoom.js";
 import Router from "../../../services/Router.js";
+import { Notification } from "../../../services/Notifications.js";
 
 export default class IngredientsSection extends WebComponent {
   constructor() {
@@ -18,7 +19,13 @@ export default class IngredientsSection extends WebComponent {
     const mixingroom = await MixingRoom.find({});
 
     if (mixingroom[0].id != Number(mixingroomId)) {
-      addButton.remove()
+      addButton.removeAttribute("popovertarget");
+      addButton.addEventListener("click", (event) => {
+        new Notification(
+          `You can only add ingredients inside of ${mixingroom[0].displayName}`,
+          "error"
+        );
+      });
     }
 
     this.ingredientListElement =

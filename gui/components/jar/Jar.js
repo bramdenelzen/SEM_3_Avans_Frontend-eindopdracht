@@ -12,6 +12,7 @@ export default class Jar extends WebComponent {
   #jar = null;
 
   #minMixingSpeed = null;
+  #minMixingTime = null;
 
   constructor() {
     super(Jar.html, Jar.css);
@@ -61,7 +62,16 @@ export default class Jar extends WebComponent {
     }
 
     this.#ingredients.push(ingredient);
-    console.log(`Adding ingredient ${ingredient.id} to jar ${this.#jar.id}`);
+
+    const minMixingTimeValue = this.#ingredients.reduce(
+      (minTime, ingredient) =>
+        minTime > ingredient.minMixingTime ? minTime : ingredient.minMixingTime,
+      0
+    );
+
+    this.#minMixingTime = minMixingTimeValue;
+
+    this.updateSpecs();
     this.updateLayers();
   }
 
@@ -129,6 +139,19 @@ export default class Jar extends WebComponent {
       console.error("Error handling drop event:", error);
       new Notification(error.message, "error");
     }
+  }
+
+  updateSpecs() {
+    const mixingSpeed = this.shadowRoot.getElementById("mixing-speed");
+    const minMixingTime = this.shadowRoot.getElementById("min-mixing-time");
+
+    mixingSpeed.innerText = this.#minMixingSpeed
+      ? `Mixing Speed: ${this.#minMixingSpeed}`
+      : "";
+
+    minMixingTime.innerText = `Min mixing Time: ${this.#minMixingTime} sec`;
+
+    console.log(mixingSpeed);
   }
 
   updateLayers() {

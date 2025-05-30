@@ -33,7 +33,8 @@ export default {
         "ToastList",
         "JarsSection",
         "MixerSection",
-        "MixerForm"
+        "MixerForm",
+        "Mixer",
       ],
       pages: ["Home", "Error", "MixingRoom"],
       layouts: ["Layout"],

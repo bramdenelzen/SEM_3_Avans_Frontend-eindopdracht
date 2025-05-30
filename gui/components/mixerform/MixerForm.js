@@ -1,6 +1,8 @@
 import WebComponent from "../../Webcomponent.js";
 import Ingredient from "../../../database/models/Ingredient.js";
 import { Notification } from "../../../services/Notifications.js";
+import Mixer from "../../../database/models/Mixer.js";
+import Router from "../../../services/Router.js";
 
 export default class MixerForm extends WebComponent {
   constructor() {
@@ -21,28 +23,34 @@ export default class MixerForm extends WebComponent {
    * @param {SubmitEvent} event
    */
   async submitHandler(event) {
-    console.log("submitHandler called");
     event.preventDefault();
     this.errorElement.innerText = "";
-    const formData = new FormData(this.formElement);
 
     try {
-      const ingredient = new Ingredient({
-        minMixingTime: Number(formData.get("minMixingTime")),
-        minMixingSpeed: Number(formData.get("minMixingSpeed")),
-        colorHexcode: formData.get("color"),
-        texture: formData.get("texture"),
+          const formData = new FormData(this.formElement);
+
+      const { mixingroomId } = new Router().getParams();
+
+      const mixers = await Mixer.find({ mixingroomId: Number(mixingroomId) });
+      if (mixers.length >= 5) {
+        throw new Error("You can only have 5 mixers per mixing room");
+      }
+      const mixer = new Mixer({
+        mixingTime: Number(formData.get("mixingTime")),
+        mixingSpeed: Number(formData.get("mixingSpeed")),
+        mixingroomId: Number(mixingroomId),
       });
 
-      await ingredient.save();
-      
+      await mixer.save();
+
       this.dispatchEvent(
-        new CustomEvent("submitSucces", { detail: { data: ingredient } })
+        new CustomEvent("submitSucces", { detail: { data: mixer } })
       );
       this.formElement.reset();
       new Notification("Mixer created successfully", "success");
     } catch (error) {
       this.errorElement.innerText = `** ${error.message} **`;
+      console.error("Error creating mixer:", error);
     }
   }
 }
