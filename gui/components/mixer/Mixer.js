@@ -73,15 +73,6 @@ export default class Mixer extends WebComponent {
     }
   }
 
-  /**
-   *
-   * @param {{
-   * id: number,
-   * colorHexcode: string,
-   * minMixingSpeed: number,
-   * minMixingTime: number,
-   * }} ingredients
-   */
   async _mix(dropEventJSON) {
     try {
       window.dispatchEvent(

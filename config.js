@@ -35,6 +35,7 @@ export default {
         "MixerSection",
         "MixerForm",
         "Mixer",
+        "EndResults"
       ],
       pages: ["Home", "Error", "MixingRoom"],
       layouts: ["Layout"],
