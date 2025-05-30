@@ -5,6 +5,8 @@ export default class EndResults extends WebComponent {
   constructor() {
     super(EndResults.html, EndResults.css);
     this.updateList();
+
+    window.addEventListener("mixing-success", this.updateList.bind(this));
   }
   async updateList() {
     const resultsList = this.shadowRoot.getElementById("results-list");

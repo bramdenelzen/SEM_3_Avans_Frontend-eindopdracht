@@ -110,19 +110,16 @@ export default class Mixer extends WebComponent {
       // Convert back to hex with padding
       const toHex = (val) => val.toString(16).padStart(2, "0");
 
-      const endResult = `#${toHex(avgR)}${toHex(avgG)}${toHex(avgB)}`;
-
-      const resultDbRecord = new ResultColor({ colorHexcode: endResult });
-      await resultDbRecord.save();
-
-      if (!resultDbRecord.id) {
-        throw new Error(
-          "Failed to save the result color in the database"
-        );
-      }
-
-      await new Promise((resolve) =>
+      await new Promise((resolve, reject) =>
         setTimeout(async () => {
+          const endResult = `#${toHex(avgR)}${toHex(avgG)}${toHex(avgB)}`;
+
+          const resultDbRecord = new ResultColor({ colorHexcode: endResult });
+          await resultDbRecord.save();
+
+          if (!resultDbRecord.id) {
+            reject("Failed to save result color to database");
+          }
           resolve();
         }, dropEventJSON.jar.mixingTime * 100)
       );
