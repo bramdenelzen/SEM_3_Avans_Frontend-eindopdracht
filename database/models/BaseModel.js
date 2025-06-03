@@ -10,6 +10,8 @@ export default class BaseModel {
     this.db = databaseInstance;
   }
 
+  #instanceSubscribers = [];
+
   constructor(modelName, data = {}) {
     if (!this.constructor.db) {
       throw new Error("Database not configured.");
@@ -20,6 +22,97 @@ export default class BaseModel {
 
     // Assign all properties from data to the instance
     Object.assign(this, data);
+  }
+
+  subscribeToInstance(callback) {
+    if (!this.id) throw new Error("Instance must have an id to subscribe.");
+
+    console.log(this.id);
+    if (!this.constructor.instanceSubscribers) {
+      this.constructor.instanceSubscribers = {};
+    }
+
+    if (!this.constructor.instanceSubscribers[this.id]) {
+      this.constructor.instanceSubscribers[this.id] = [];
+    }
+    this.constructor.instanceSubscribers[this.id].push(callback);
+
+    console.log(this.constructor.instanceSubscribers);
+  }
+
+  unSubscribeFromInstance(callback) {
+    const placeInList = this.#instanceSubscribers.indexOf(callback);
+    if (placeInList !== -1) {
+      this.#instanceSubscribers.splice(placeInList, 1);
+    }
+  }
+
+  notifyInstanceSubscribers(data, type) {
+    if (this.constructor.instanceSubscribers) {
+      const arr = this.constructor.instanceSubscribers[this.id] ?? [];
+      console.log(type);
+      arr.forEach((callback) => {
+        callback(data, type);
+      });
+    }
+  }
+
+  notify(data, type) {
+    this.notifyInstanceSubscribers(data, type);
+  }
+  // Save = create or update
+  async save() {
+    if (this.id) {
+      return this.update();
+    } else {
+      this._validate(this._getData());
+      const saved = await this.constructor.db.create(
+        this.modelName,
+        this._getData()
+      );
+      this.notify(saved, "saved");
+      Object.assign(this, saved); // Update instance with ID and any changes
+      return this;
+    }
+  }
+
+  async update() {
+    if (!this.id) throw new Error("Cannot update unsaved instance.");
+    this._validate(this._getData());
+    const updated = await this.constructor.db.update(
+      this.modelName,
+      this.id,
+      this._getData()
+    );
+    this.notify(updated, "update");
+    Object.assign(this, updated);
+    return this;
+  }
+
+  async delete() {
+    if (!this.id) throw new Error("Cannot delete unsaved instance.");
+    await this.constructor.db.delete(this.modelName, this.id);
+    this.notify({}, "delete");
+    return true;
+  }
+
+  // Get plain data object (excluding DB/config fields)
+  _getData() {
+    const data = { ...this };
+    delete data.modelName;
+    return data;
+  }
+
+  // Static method to find and return instances
+  static async find(query = {}) {
+    const rawRecords = await this.db.read(this.modelName, query);
+    return rawRecords.map((data) => new this(data)); // return class instances
+  }
+
+  static async findById(id) {
+    const rawRecords = await this.db.read(this.modelName, { id });
+    if (rawRecords.length === 0) return null;
+    return new this(rawRecords[0]); // return class instance
   }
 
   _validate(data) {
@@ -45,57 +138,5 @@ export default class BaseModel {
         throw new Error(`Invalid property ${key} for model ${this.modelName}`);
       }
     }
-  }
-
-  // Save = create or update
-  async save() {
-    if (this.id) {
-      return this.update();
-    } else {
-      this._validate(this._getData());
-      const saved = await this.constructor.db.create(
-        this.modelName,
-        this._getData()
-      );
-      Object.assign(this, saved); // Update instance with ID and any changes
-      return this;
-    }
-  }
-
-  async update() {
-    if (!this.id) throw new Error("Cannot update unsaved instance.");
-    this._validate(this._getData());
-    const updated = await this.constructor.db.update(
-      this.modelName,
-      this.id,
-      this._getData()
-    );
-    Object.assign(this, updated);
-    return this;
-  }
-
-  async delete() {
-    if (!this.id) throw new Error("Cannot delete unsaved instance.");
-    await this.constructor.db.delete(this.modelName, this.id);
-    return true;
-  }
-
-  // Get plain data object (excluding DB/config fields)
-  _getData() {
-    const data = { ...this };
-    delete data.modelName;
-    return data;
-  }
-
-  // Static method to find and return instances
-  static async find(query = {}) {
-    const rawRecords = await this.db.read(this.modelName, query);
-    return rawRecords.map((data) => new this(data)); // return class instances
-  }
-
-  static async findById(id) {
-    const rawRecords = await this.db.read(this.modelName, { id });
-    if (rawRecords.length === 0) return null;
-    return new this(rawRecords[0]); // return class instance
   }
 }

@@ -16,6 +16,8 @@ export default class Layout extends WebComponent {
     console.log(currentPath);
     if (currentPath === "/"){
       this.shadowRoot.getElementById("home-link").classList.add("active");
+    }else if (currentPath === "/colortesting"){
+      this.shadowRoot.getElementById("colortesting-link").classList.add("active");
     }
 
     for (const mixingRoom of mixingRooms) {

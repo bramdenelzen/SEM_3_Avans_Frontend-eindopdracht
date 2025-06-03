@@ -17,6 +17,7 @@ export default {
       "/": `<x-home></x-home>`,
       "/about": `<x-mixingroom></x-mixingroom>`,
       "/mixingroom/{mixingroomId}": `<x-mixingroom></x-mixingroom>`,
+      "/colortesting": `<x-colortesting></x-colortesting>`,
     },
   },
   Gui: {
@@ -24,7 +25,6 @@ export default {
       components: [
         "Button",
         "IngredientsSection",
-        "InputField",
         "IngredientsForm",
         "IngredientListItem",
         "Jar",
@@ -35,9 +35,10 @@ export default {
         "MixerSection",
         "MixerForm",
         "Mixer",
-        "EndResults"
+        "EndResults",
+        "ColorTestingCell",
       ],
-      pages: ["Home", "Error", "MixingRoom"],
+      pages: ["Home", "Error", "MixingRoom", "ColorTesting"],
       layouts: ["Layout"],
     },
   },

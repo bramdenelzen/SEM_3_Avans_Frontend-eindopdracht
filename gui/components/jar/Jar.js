@@ -21,43 +21,43 @@ export default class Jar extends WebComponent {
     this.#layers.push(this.shadowRoot.getElementById("layer-2"));
     this.#layers.push(this.shadowRoot.getElementById("layer-1"));
 
-    window.addEventListener("mixing-started", async (event) => {
-      try {
-        const { jarId } = event.detail;
-        if (this.#jar.id !== jarId) {
-          return;
-        }
-        this.remove();
-      } catch (error) {
-        console.error(`Error handling jarChanged event: ${error.message}`);
-      }
-    });
+    // window.addEventListener("mixing-started", async (event) => {
+    //   try {
+    //     const { jarId } = event.detail;
+    //     if (this.#jar.id !== jarId) {
+    //       return;
+    //     }
+    //     this.remove();
+    //   } catch (error) {
+    //     console.error(`Error handling jarChanged event: ${error.message}`);
+    //   }
+    // });
 
-    window.addEventListener("mixing-success", async (event) => {
-      const { jarId, resultColor } = event.detail;
+    // window.addEventListener("mixing-success", async (event) => {
+    //   const { jarId, resultColor } = event.detail;
 
-      console.log("mixing-success event received", jarId, resultColor);
-      if (this.#jar.id !== jarId) {
-        return;
-      }
+    //   console.log("mixing-success event received", jarId, resultColor);
+    //   if (this.#jar.id !== jarId) {
+    //     return;
+    //   }
 
-      console.log("mixing-success", this.#jar, resultColor);
+    //   console.log("mixing-success", this.#jar, resultColor);
 
-      await this.#jar.delete();
+    //   await this.#jar.delete();
 
-      const jarIngredients = await JarHasIngredient.find({
-        jarId: jarId,
-      });
+    //   const jarIngredients = await JarHasIngredient.find({
+    //     jarId: jarId,
+    //   });
 
-      console.log("jarIngredients", jarIngredients);
+    //   console.log("jarIngredients", jarIngredients);
 
-      jarIngredients.map(async (ingredient) => {
-        const deleted = await ingredient.delete();
-        if (!deleted) {
-          throw new Error(`Ingredient ${ingredient.name} could not be deleted`);
-        }
-      });
-    });
+    //   jarIngredients.map(async (ingredient) => {
+    //     const deleted = await ingredient.delete();
+    //     if (!deleted) {
+    //       throw new Error(`Ingredient ${ingredient.name} could not be deleted`);
+    //     }
+    //   });
+    // });
   }
 
   /**
@@ -67,9 +67,14 @@ export default class Jar extends WebComponent {
     if (!(jar instanceof JarModel)) {
       throw new Error("Jar must be of type Jar");
     }
-
     this.#jar = jar;
     this.__getIngredients();
+    this.#jar.subscribeToInstance(this.testMethod.bind(this));
+  }
+
+  testMethod(data, type) {
+    console.log(data, type);
+    this.remove()
   }
 
   async __getIngredients() {
@@ -108,7 +113,6 @@ export default class Jar extends WebComponent {
     );
 
     this.#minMixingTime = minMixingTimeValue;
-
     this.updateSpecs();
     this.updateLayers();
   }
@@ -161,7 +165,6 @@ export default class Jar extends WebComponent {
 
   async _dropHandler(event) {
     event.preventDefault();
-
     try {
       const dropEventJSON = JSON.parse(
         event.dataTransfer.getData("text/plain")
