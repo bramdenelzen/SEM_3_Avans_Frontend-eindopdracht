@@ -59,11 +59,12 @@ export default class Jar extends WebComponent {
     this.#jar.subscribeToInstance(this.update.bind(this));
 
     Mixer.find({ jarId: this.#jar.id }).then((mixers) => {
-      this.#currentMixer = mixers[0] || null;
-      if (this.#currentMixer) {
-        this.shadowRoot.getElementById("jar").classList.add("mixing");
-      } else {
-        this.shadowRoot.getElementById("jar").classList.remove("mixing");
+      if (mixers.length > 0) {
+        mixers[0].jarId = null;
+        mixers[0].save().then(() => {
+          this.shadowRoot.getElementById("jar").classList.remove("mixing");
+          this.#currentMixer = null;
+        });
       }
     });
 
