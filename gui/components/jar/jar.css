@@ -7,6 +7,13 @@ svg {
     height: 100%;
     position: relative;
     display: flex;
+    padding: 2rem;
+    border: var(--base-200) 1px solid;
+    border-radius: var(--radius-md);
     flex-direction: column;
     /* display: block; */
+}
+
+.mixing{
+  display: none;
 }

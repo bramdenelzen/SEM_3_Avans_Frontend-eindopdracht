@@ -75,12 +75,9 @@ export default class Mixer extends WebComponent {
 
   async _mix(dropEventJSON) {
     try {
-      window.dispatchEvent(
-        new CustomEvent("mixing-started", {
-          detail: { jarId: dropEventJSON.jar.id },
-        })
-      );
       this.#isMixing = true;
+      this.#mixer.jarId = parseInt(dropEventJSON.jar.id);
+      await this.#mixer.save();
 
       new Notification("Mixer started mixing", "info");
 
@@ -99,27 +96,22 @@ export default class Mixer extends WebComponent {
       const resultDbRecord = new ResultColor({ colorHexcode: averageColor });
       await resultDbRecord.save();
       if (!resultDbRecord.id) {
-        reject("Failed to save result color to database");
-      } 
+        throw new Error("Failed to save result color to database");
+      }
 
-      const jar = await Jar.findById(dropEventJSON.jar.id)
-      jar.delete()
+      const jar = await Jar.findById(dropEventJSON.jar.id);
+      jar.delete();
 
       this.#isMixing = false;
 
-      window.dispatchEvent(
-        new CustomEvent("mixing-success", {
-          detail: { jarId: dropEventJSON.jar.id, resultId: resultDbRecord.id },
-        })
-      );
-
       new Notification("Mixer finished mixing", "success");
+      this.#mixer.jarId = null;
+      await this.#mixer.save();
     } catch (error) {
-      window.dispatchEvent(
-        new CustomEvent("mixing-failed", {
-          detail: { jarId: dropEventJSON.jar.id },
-        })
-      );
+      this.#isMixing = false;
+      this.#mixer.jarId = null;
+      await this.#mixer.save();
+
       throw new Error(`Something went wrong while mixing: ${error.message}`);
     }
   }

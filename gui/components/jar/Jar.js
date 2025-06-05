@@ -3,6 +3,7 @@ import JarHasIngredient from "../../../database/models/JarHasIngredient.js";
 import WebComponent from "../../Webcomponent.js";
 import { Notification } from "../../../services/Notifications.js";
 import JarModel from "../../../database/models/Jar.js";
+import Mixer from "../../../database/models/Mixer.js";
 
 export default class Jar extends WebComponent {
   #layers = [];
@@ -10,6 +11,7 @@ export default class Jar extends WebComponent {
   #ingredients = [];
 
   #jar = null;
+  #currentMixer = null;
 
   #mixingSpeed = null;
   #minMixingTime = null;
@@ -20,44 +22,28 @@ export default class Jar extends WebComponent {
     this.#layers.push(this.shadowRoot.getElementById("layer-3"));
     this.#layers.push(this.shadowRoot.getElementById("layer-2"));
     this.#layers.push(this.shadowRoot.getElementById("layer-1"));
+  }
 
-    // window.addEventListener("mixing-started", async (event) => {
-    //   try {
-    //     const { jarId } = event.detail;
-    //     if (this.#jar.id !== jarId) {
-    //       return;
-    //     }
-    //     this.remove();
-    //   } catch (error) {
-    //     console.error(`Error handling jarChanged event: ${error.message}`);
-    //   }
-    // });
+  connectedCallback() {
+    this.draggable = true;
+    this.addEventListener("dragstart", this._dragstartHandler.bind(this));
 
-    // window.addEventListener("mixing-success", async (event) => {
-    //   const { jarId, resultColor } = event.detail;
+    this.shadowRoot.addEventListener("drop", this._dropHandler.bind(this));
+    this.shadowRoot.addEventListener(
+      "dragover",
+      this._dragoverHandler.bind(this)
+    );
 
-    //   console.log("mixing-success event received", jarId, resultColor);
-    //   if (this.#jar.id !== jarId) {
-    //     return;
-    //   }
+    this.updateLayers();
+  }
 
-    //   console.log("mixing-success", this.#jar, resultColor);
-
-    //   await this.#jar.delete();
-
-    //   const jarIngredients = await JarHasIngredient.find({
-    //     jarId: jarId,
-    //   });
-
-    //   console.log("jarIngredients", jarIngredients);
-
-    //   jarIngredients.map(async (ingredient) => {
-    //     const deleted = await ingredient.delete();
-    //     if (!deleted) {
-    //       throw new Error(`Ingredient ${ingredient.name} could not be deleted`);
-    //     }
-    //   });
-    // });
+  disconnectedCallback() {
+    this.removeEventListener("dragstart", this._dragstartHandler.bind(this));
+    this.shadowRoot.removeEventListener("drop", this._dropHandler.bind(this));
+    this.shadowRoot.removeEventListener(
+      "dragover",
+      this._dragoverHandler.bind(this)
+    );
   }
 
   /**
@@ -67,19 +53,42 @@ export default class Jar extends WebComponent {
     if (!(jar instanceof JarModel)) {
       throw new Error("Jar must be of type Jar");
     }
+
     this.#jar = jar;
     this.__getIngredients();
-    this.#jar.subscribeToInstance(this.testMethod.bind(this));
+    this.#jar.subscribeToInstance(this.update.bind(this));
+
+    Mixer.find({ jarId: this.#jar.id }).then((mixers) => {
+      this.#currentMixer = mixers[0] || null;
+    });
+
+    Mixer.subscribeToModel((data, type) => {
+      if (this.#jar.id=== data.jarId){
+        this.shadowRoot.getElementById("jar").classList.add("mixing");
+        this.#currentMixer = data.id;
+      } else if (this.#currentMixer == data.id && data.jarId === null){
+        this.shadowRoot.getElementById("jar").classList.remove("mixing");
+        this.#currentMixer = null;
+      }
+    });
   }
 
-  testMethod(data, type) {
-    console.log(data, type);
-    this.remove()
+  update(data, type) {
+    if (type === "delete") {
+      this.remove();
+    }
+    if (type === "update") {
+      this.#jar = data;
+      this.__getIngredients();
+      this.updateSpecs();
+      this.updateLayers();
+    }
   }
 
   async __getIngredients() {
     const ingredients = await JarHasIngredient.find({ jarId: this.#jar.id });
-    console.log("ingredients", ingredients);
+
+    this.#ingredients = [];
     for (const jarIngredient of ingredients) {
       const ingredient = await Ingredient.findById(jarIngredient.ingredientId);
       if (ingredient) {
@@ -117,26 +126,24 @@ export default class Jar extends WebComponent {
     this.updateLayers();
   }
 
-  connectedCallback() {
-    this.draggable = true;
-    this.addEventListener("dragstart", this._dragstartHandler.bind(this));
+  updateSpecs() {
+    const mixingSpeed = this.shadowRoot.getElementById("mixing-speed");
+    const minMixingTime = this.shadowRoot.getElementById("min-mixing-time");
 
-    this.shadowRoot.addEventListener("drop", this._dropHandler.bind(this));
-    this.shadowRoot.addEventListener(
-      "dragover",
-      this._dragoverHandler.bind(this)
-    );
+    mixingSpeed.innerText = this.#mixingSpeed
+      ? `Mixing Speed: ${this.#mixingSpeed} RPM`
+      : "";
 
-    this.updateLayers();
+    minMixingTime.innerText = `Min mixing Time: ${this.#minMixingTime} sec`;
   }
 
-  disconnectedCallback() {
-    this.removeEventListener("dragstart", this._dragstartHandler.bind(this));
-    this.shadowRoot.removeEventListener("drop", this._dropHandler.bind(this));
-    this.shadowRoot.removeEventListener(
-      "dragover",
-      this._dragoverHandler.bind(this)
-    );
+  updateLayers() {
+    this.#layers.forEach((layer, index) => {
+      layer.setAttribute(
+        "fill",
+        this.#ingredients[index]?.colorHexcode || "#ffffff"
+      );
+    });
   }
 
   async _dragstartHandler(event) {
@@ -207,28 +214,6 @@ export default class Jar extends WebComponent {
       console.error("Error handling drop event:", error);
       new Notification(error.message, "error");
     }
-  }
-
-  updateSpecs() {
-    const mixingSpeed = this.shadowRoot.getElementById("mixing-speed");
-    const minMixingTime = this.shadowRoot.getElementById("min-mixing-time");
-
-    mixingSpeed.innerText = this.#mixingSpeed
-      ? `Mixing Speed: ${this.#mixingSpeed} RPM`
-      : "";
-
-    minMixingTime.innerText = `Min mixing Time: ${this.#minMixingTime} sec`;
-
-    console.log(mixingSpeed);
-  }
-
-  updateLayers() {
-    this.#layers.forEach((layer, index) => {
-      layer.setAttribute(
-        "fill",
-        this.#ingredients[index]?.colorHexcode || "#ffffff"
-      );
-    });
   }
 
   _dragoverHandler(event) {

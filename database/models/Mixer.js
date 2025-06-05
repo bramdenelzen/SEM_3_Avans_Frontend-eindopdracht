@@ -8,6 +8,9 @@ export default class Mixer extends BaseModel {
       type: "number",
       required: true,
     },
+    jarId: {
+      type: "number",
+    },
     mixingroomId: {
       type: "number",
       required: true,
@@ -15,7 +18,6 @@ export default class Mixer extends BaseModel {
   };
 
   /**
-   *
    * @param {number} minMixingTimeOrData
    * @param {number} minMixingSpeed
    * @param {string} colorCode
@@ -29,7 +31,7 @@ export default class Mixer extends BaseModel {
     } else {
       data = {
         mixingSpeed: mixingSpeedOrData,
-        mixingroomId: mixingroomId, 
+        mixingroomId: mixingroomId,
       };
     }
 

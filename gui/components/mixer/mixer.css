@@ -1,3 +1,5 @@
 div{
-    background-color: red;
+padding: 2rem;
+border-radius: var(--radius-md);
+border: var(--base-200) 1px solid;
 }

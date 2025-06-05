@@ -24,10 +24,32 @@ export default class BaseModel {
     Object.assign(this, data);
   }
 
+  static subscribeToModel(callback) {
+    if (!this.modelSubscribers) {
+      this.modelSubscribers = [];
+    }
+    this.modelSubscribers.push(callback);
+  }
+
+  static unSubscribeFromModel(callback) {
+    if (!this.modelSubscribers) return;
+    const placeInList = this.modelSubscribers.indexOf(callback);
+    if (placeInList !== -1) {
+      this.modelSubscribers.splice(placeInList, 1);
+    }
+  }
+
+  notifyModelSubscribers(data, type) {
+    if (this.constructor.modelSubscribers) {
+      this.constructor.modelSubscribers.forEach((callback) => {
+        callback(data, type);
+      });
+    }
+  }
+
   subscribeToInstance(callback) {
     if (!this.id) throw new Error("Instance must have an id to subscribe.");
 
-    console.log(this.id);
     if (!this.constructor.instanceSubscribers) {
       this.constructor.instanceSubscribers = {};
     }
@@ -36,8 +58,6 @@ export default class BaseModel {
       this.constructor.instanceSubscribers[this.id] = [];
     }
     this.constructor.instanceSubscribers[this.id].push(callback);
-
-    console.log(this.constructor.instanceSubscribers);
   }
 
   unSubscribeFromInstance(callback) {
@@ -50,7 +70,6 @@ export default class BaseModel {
   notifyInstanceSubscribers(data, type) {
     if (this.constructor.instanceSubscribers) {
       const arr = this.constructor.instanceSubscribers[this.id] ?? [];
-      console.log(type);
       arr.forEach((callback) => {
         callback(data, type);
       });
@@ -59,8 +78,9 @@ export default class BaseModel {
 
   notify(data, type) {
     this.notifyInstanceSubscribers(data, type);
+    this.notifyModelSubscribers(data, type);
   }
-  // Save = create or update
+
   async save() {
     if (this.id) {
       return this.update();
@@ -117,22 +137,37 @@ export default class BaseModel {
 
   _validate(data) {
     for (const key in this.constructor.schema) {
-      if (key.required && (!data[key] || data[key] == "" || data[key] == NaN)) {
+      const schemaField = this.constructor.schema[key];
+      const value = data[key];
+
+      // Required check
+      if (
+        schemaField.required &&
+        (value === undefined ||
+          value === null ||
+          value === "" ||
+          Number.isNaN(value))
+      ) {
         throw new Error(`Field ${key} is required`);
       }
     }
 
     for (const key in data) {
       if (key == "id") continue; // Skip ID validation
-      if (this.constructor.schema[key]) {
-        if (this.constructor.schema[key].type == typeof data[key]) {
-          this[key] = data[key];
-        } else {
-          throw new Error(
-            `Invalid type for property ${key}. Expected ${
-              this.constructor.schema[key].type
-            }, got ${typeof data[key]}`
-          );
+      const schemaField = this.constructor.schema[key];
+      const value = data[key];
+
+      // Only type check if value is not null or undefined
+      if (schemaField) {
+        if (value !== undefined && value !== null) {
+          if (typeof value !== schemaField.type) {
+            throw new Error(
+              `Invalid type for property ${key}. Expected ${
+                schemaField.type
+              }, got ${typeof value}`
+            );
+          }
+          this[key] = value;
         }
       } else {
         throw new Error(`Invalid property ${key} for model ${this.modelName}`);

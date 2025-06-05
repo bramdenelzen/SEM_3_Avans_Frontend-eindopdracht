@@ -1,7 +1,7 @@
 .header {
   margin-bottom: 25.888px;
   display: flex;
-  align-items:center;
+  align-items: center;
   gap: 20px;
 
   > h2 {
@@ -9,7 +9,14 @@
   }
 }
 section {
-    padding-bottom: var(--section-padding-md);
-    padding-top: var(--section-padding-md);
-    height: 100%;
+  padding-bottom: var(--section-padding-md);
+  padding-top: var(--section-padding-md);
+  height: 100%;
+}
+
+ul {
+  height: 100%;
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
 }
