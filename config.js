@@ -29,7 +29,6 @@ export default {
   Gui: {
     registeredGuiFiles: {
       components: [
-        "Button",
         "IngredientsSection",
         "IngredientsForm",
         "IngredientListItem",

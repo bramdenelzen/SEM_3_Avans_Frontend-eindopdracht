@@ -3,6 +3,9 @@ import Ingredient from "../../../database/models/Ingredient.js";
 import { Notification } from "../../../services/Notifications.js";
 
 export default class IngredientsForm extends WebComponent {
+
+  #submitHandler
+
   constructor() {
     super(IngredientsForm.html, IngredientsForm.css);
 
@@ -10,10 +13,16 @@ export default class IngredientsForm extends WebComponent {
     this.errorElement = this.shadowRoot.getElementById("error");
     this.setAttribute("popover", "");
     this.classList.add("popover")
+
+    this.#submitHandler = this.submitHandler.bind(this);
   }
 
   connectedCallback() {
-    this.formElement.addEventListener("submit", this.submitHandler.bind(this));
+    this.formElement.addEventListener("submit", this.#submitHandler);
+  }
+  
+  disconnectedCallback() {
+    this.formElement.removeEventListener("submit", this.#submitHandler);
   }
 
   /**
