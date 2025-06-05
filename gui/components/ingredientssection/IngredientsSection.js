@@ -34,19 +34,25 @@ export default class IngredientsSection extends WebComponent {
     this.form = this.shadowRoot.querySelector("x-ingredientsform");
 
     this.seedList();
+    
+    
+    IngredientModel.subscribeToModel(
+      async function (data, type) {
+        if (type !== "create") {
+          const ingredient = await IngredientModel.findById(data.id); // Use the data argument directly
 
-    this.form.addEventListener("submitSucces", (event) => {
-      const ingredient = event.detail.data;
+          const ingredientListItemElement = document.createElement(
+            "x-ingredientlistitem"
+          );
+          console.log(data)
+          ingredientListItemElement.ingredient = ingredient;
 
-      const ingredientListItemElement = document.createElement(
-        "x-ingredientlistitem"
-      );
-      ingredientListItemElement.ingredient = ingredient;
-
-      this.ingredientListElement.prepend(ingredientListItemElement);
-
-      this.form.hidePopover();
-    });
+          this.ingredientListElement.prepend(ingredientListItemElement);
+          return;
+        }
+        this.seedList()
+      }.bind(this)
+    );
   }
 
   disconnectedCallback() {
@@ -54,6 +60,7 @@ export default class IngredientsSection extends WebComponent {
   }
 
   async seedList() {
+    this.ingredientListElement.innerHTML = "";
     const ingredients = await Ingredient.find({});
 
     for (const ingredient of ingredients) {

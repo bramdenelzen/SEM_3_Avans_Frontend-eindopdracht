@@ -8,6 +8,9 @@ export default class IngredientsForm extends WebComponent {
 
     this.formElement = this.shadowRoot.querySelector("form");
     this.errorElement = this.shadowRoot.getElementById("error");
+
+    this.popover = true;
+    this.classList.add("popover")
   }
 
   connectedCallback() {
@@ -34,7 +37,8 @@ export default class IngredientsForm extends WebComponent {
       });
 
       await ingredient.save();
-      
+      this.hidePopover()
+
       this.dispatchEvent(
         new CustomEvent("submitSucces", { detail: { data: ingredient } })
       );

@@ -45,7 +45,7 @@ export default class Mixer extends WebComponent {
         event.dataTransfer.getData("text/plain")
       );
 
-      if (this.#isMixing) {
+      if (this.#mixer.jarId) {
         new Notification("Mixer is already mixing", "error");
         return;
       }
@@ -75,7 +75,6 @@ export default class Mixer extends WebComponent {
 
   async _mix(dropEventJSON) {
     try {
-      this.#isMixing = true;
       this.#mixer.jarId = parseInt(dropEventJSON.jar.id);
       await this.#mixer.save();
 
@@ -108,7 +107,6 @@ export default class Mixer extends WebComponent {
       this.#mixer.jarId = null;
       await this.#mixer.save();
     } catch (error) {
-      this.#isMixing = false;
       this.#mixer.jarId = null;
       await this.#mixer.save();
 

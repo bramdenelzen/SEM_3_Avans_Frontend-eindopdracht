@@ -20,7 +20,6 @@ export default class BaseModel {
     this.modelName = modelName;
     this.id = data.id || null;
 
-    // Assign all properties from data to the instance
     Object.assign(this, data);
   }
 
@@ -36,14 +35,6 @@ export default class BaseModel {
     const placeInList = this.modelSubscribers.indexOf(callback);
     if (placeInList !== -1) {
       this.modelSubscribers.splice(placeInList, 1);
-    }
-  }
-
-  notifyModelSubscribers(data, type) {
-    if (this.constructor.modelSubscribers) {
-      this.constructor.modelSubscribers.forEach((callback) => {
-        callback(data, type);
-      });
     }
   }
 
@@ -67,6 +58,19 @@ export default class BaseModel {
     }
   }
 
+  notify(data, type) {
+    this.notifyInstanceSubscribers(data, type);
+    this.notifyModelSubscribers(data, type);
+  }
+
+  notifyModelSubscribers(data, type) {
+    if (this.constructor.modelSubscribers) {
+      this.constructor.modelSubscribers.forEach((callback) => {
+        callback(data, type);
+      });
+    }
+  }
+
   notifyInstanceSubscribers(data, type) {
     if (this.constructor.instanceSubscribers) {
       const arr = this.constructor.instanceSubscribers[this.id] ?? [];
@@ -74,11 +78,6 @@ export default class BaseModel {
         callback(data, type);
       });
     }
-  }
-
-  notify(data, type) {
-    this.notifyInstanceSubscribers(data, type);
-    this.notifyModelSubscribers(data, type);
   }
 
   async save() {
