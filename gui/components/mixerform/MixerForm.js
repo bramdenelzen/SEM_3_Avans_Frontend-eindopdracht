@@ -5,17 +5,22 @@ import Mixer from "../../../database/models/Mixer.js";
 import Router from "../../../services/Router.js";
 
 export default class MixerForm extends WebComponent {
+  #submitHandler;
+
   constructor() {
     super(MixerForm.html, MixerForm.css);
 
+    this.#submitHandler = this.submitHandler.bind(this);
     this.formElement = this.shadowRoot.querySelector("form");
     this.errorElement = this.shadowRoot.getElementById("error");
   }
 
   connectedCallback() {
-    this.formElement.addEventListener("submit", this.submitHandler.bind(this));
+    this.formElement.addEventListener("submit", this.#submitHandler);
+  }
 
-    console.log(this.formElement);
+  disconnectedCallback() {
+    this.formElement.removeEventListener("submit", this.#submitHandler);
   }
 
   /**
@@ -27,7 +32,7 @@ export default class MixerForm extends WebComponent {
     this.errorElement.innerText = "";
 
     try {
-          const formData = new FormData(this.formElement);
+      const formData = new FormData(this.formElement);
 
       const { mixingroomId } = new Router().getParams();
 
@@ -49,7 +54,6 @@ export default class MixerForm extends WebComponent {
       new Notification("Mixer created successfully", "success");
     } catch (error) {
       this.errorElement.innerText = `** ${error.message} **`;
-      console.error("Error creating mixer:", error);
     }
   }
 }

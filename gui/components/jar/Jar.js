@@ -58,29 +58,22 @@ export default class Jar extends WebComponent {
     this.__getIngredients();
     this.#jar.subscribeToInstance(this.update.bind(this));
 
-    Mixer.find({ jarId: this.#jar.id }).then((mixers) => {
-      if (mixers.length > 0) {
-        mixers[0].jarId = null;
-        mixers[0].save().then(() => {
-          this.shadowRoot.getElementById("jar").classList.remove("mixing");
-          this.#currentMixer = null;
-        });
-      }
-    });
-
     Mixer.subscribeToModel((data, type) => {
       if (this.#jar.id=== data.jarId){
         this.shadowRoot.getElementById("jar").classList.add("mixing");
         this.#currentMixer = data.id;
+        console.log("Jar is now mixing with mixer ID:", data.id);
       } else if (this.#currentMixer == data.id && data.jarId === null){
         this.shadowRoot.getElementById("jar").classList.remove("mixing");
         this.#currentMixer = null;
+        console.log("Jar is no longer mixing");
       }
     });
   }
 
   update(data, type) {
     if (type === "delete") {
+      console.log("Jar deleted:", this.#jar.id);
       this.remove();
     }
     if (type === "update") {

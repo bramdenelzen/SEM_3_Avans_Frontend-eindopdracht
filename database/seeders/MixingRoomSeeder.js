@@ -15,7 +15,7 @@ export default class MixingRoomSeeder extends BaseSeeder {
         mixingRooms.push(mixingRoom);
       }
     } else if (mixingRooms.length > totalMixingRooms) {
-      // Optionally delete extras if too many exist
+
       const excessRooms = mixingRooms.slice(totalMixingRooms);
       for (const room of excessRooms) {
         await room.delete()

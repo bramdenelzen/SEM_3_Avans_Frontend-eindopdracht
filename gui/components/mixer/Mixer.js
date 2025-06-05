@@ -7,10 +7,16 @@ import ResultColor from "../../../database/models/ResultColor.js";
 export default class Mixer extends WebComponent {
   #mixer;
 
-  #isMixing = false;
+  #dragoverHandler;
+  #dropHandler;
 
   constructor() {
     super(Mixer.html, Mixer.css);
+
+    this.#dragoverHandler = (event) => {
+      event.preventDefault();
+    };
+    this.#dropHandler = this._drophandler.bind(this);
   }
 
   /**
@@ -24,22 +30,23 @@ export default class Mixer extends WebComponent {
   }
 
   connectedCallback() {
-    if (!this.#mixer) {
-      throw new Error("Mixer not set");
-    }
-
+    this.shadowRoot.addEventListener("dragover", this.#dragoverHandler);
+    this.shadowRoot.addEventListener("drop", this.#dropHandler);
     this.shadowRoot.querySelector("#mixingSpeed").textContent =
       this.#mixer.mixingSpeed + " RPM";
 
-    this.shadowRoot.addEventListener("dragover", (event) => {
-      event.preventDefault();
-    });
-    this.shadowRoot.addEventListener("drop", this._drophandler.bind(this));
+    if (!this.#mixer) {
+      throw new Error("Mixer not set");
+    }
+  }
+
+  disconnectedCallback() {
+    this.shadowRoot.removeEventListener("dragover", this.#dragoverHandler);
+    this.shadowRoot.removeEventListener("drop", this.#dropHandler);
   }
 
   async _drophandler(event) {
     event.preventDefault();
-
     try {
       const dropEventJSON = JSON.parse(
         event.dataTransfer.getData("text/plain")
@@ -67,41 +74,59 @@ export default class Mixer extends WebComponent {
         throw new Error("Jar is empty, please add ingredients before mixing");
       }
 
-      await this._mix(dropEventJSON);
+      await this._mix(dropEventJSON.jar);
     } catch (error) {
       new Notification(error.message, "error");
     }
   }
 
-  async _mix(dropEventJSON) {
+  async _mix(jar) {
+    new Notification("Mixer started mixing", "info");
     try {
-      this.#mixer.jarId = parseInt(dropEventJSON.jar.id);
+      this.#mixer.jarId = parseInt(jar.id);
       await this.#mixer.save();
 
-      new Notification("Mixer started mixing", "info");
-
       const averageColor = this.getAverageColorHex(
-        dropEventJSON.jar.ingredients.map(
-          (ingredient) => ingredient.colorHexcode
-        )
+        jar.ingredients.map((ingredient) => ingredient.colorHexcode)
       );
 
-      await new Promise(async (resolve, reject) => {
-        setTimeout(async () => {
-          resolve();
-        }, dropEventJSON.jar.mixingTime * 100);
+      const duration = jar.mixingTime * 1000;
+      const progressBarFill =
+        this.shadowRoot.getElementById("progress-bar-fill");
+      let start = Date.now();
+      console.log(jar);
+
+      this.style.animation = `mixing-speed ${
+        10 / jar.mixingSpeed
+      }s linear infinite`;
+
+      await new Promise((resolve) => {
+        const interval = setInterval(() => {
+          const elapsed = Date.now() - start;
+          let progress = Math.min(elapsed / duration, 1);
+          progressBarFill.style.width = progress * 100 + "%";
+
+          if (progress >= 1) {
+            clearInterval(interval);
+            progressBarFill.style.width = "0%";
+            resolve();
+          }
+        }, 50); 
       });
 
       const resultDbRecord = new ResultColor({ colorHexcode: averageColor });
+      this.style.animation = "none";
+
       await resultDbRecord.save();
       if (!resultDbRecord.id) {
         throw new Error("Failed to save result color to database");
       }
 
-      const jar = await Jar.findById(dropEventJSON.jar.id);
-      jar.delete();
+      const jarRecord = await Jar.findById(jar.id);
+      jarRecord.delete();
 
-      this.#isMixing = false;
+      progressBarFill.style.animation = "none";
+      this.style.animation = "none";
 
       new Notification("Mixer finished mixing", "success");
       this.#mixer.jarId = null;
@@ -120,10 +145,9 @@ export default class Mixer extends WebComponent {
       totalB = 0;
 
     colors.forEach((hex) => {
-      // Remove "#" if present
+    
       hex = hex.replace(/^#/, "");
 
-      // Parse R, G, B
       const r = parseInt(hex.substring(0, 2), 16);
       const g = parseInt(hex.substring(2, 4), 16);
       const b = parseInt(hex.substring(4, 6), 16);
@@ -138,7 +162,6 @@ export default class Mixer extends WebComponent {
     const avgG = Math.round(totalG / count);
     const avgB = Math.round(totalB / count);
 
-    // Convert back to hex with padding
     return `#${avgR.toString(16).padStart(2, "0")}${avgG
       .toString(16)
       .padStart(2, "0")}${avgB.toString(16).padStart(2, "0")}`;

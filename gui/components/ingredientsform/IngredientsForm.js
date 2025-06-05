@@ -8,15 +8,12 @@ export default class IngredientsForm extends WebComponent {
 
     this.formElement = this.shadowRoot.querySelector("form");
     this.errorElement = this.shadowRoot.getElementById("error");
-
-    this.popover = true;
+    this.setAttribute("popover", "");
     this.classList.add("popover")
   }
 
   connectedCallback() {
     this.formElement.addEventListener("submit", this.submitHandler.bind(this));
-
-    console.log(this.formElement);
   }
 
   /**

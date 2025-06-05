@@ -9,24 +9,41 @@ export default class MixerSection extends WebComponent {
     this.form = this.shadowRoot.getElementById("mixer-form");
     this.formbutton = this.shadowRoot.getElementById("add-mixer-button");
     this.mixerListElement = this.shadowRoot.getElementById("mixer-list");
+    this._initializemixerList();
+    console.log("MixerSection initialized");
+  }
+  static cacheInstances = [];
+
+  #formSubmitHandler = function (event) {
+    const mixer = event.detail.data;
+    console.log("mixer", mixer);
+    this._addMixer(mixer);
+
+    this.form.hidePopover();
+    console.log(this.form);
+  }.bind(this);
+
+  static getCachedInstance() {
+    const { mixingroomId } = new Router().getParams();
+    if (MixerSection.cacheInstances[mixingroomId]) {
+      return MixerSection.cacheInstances[mixingroomId];
+    }
+    const section = document.createElement("x-mixersection");
+    MixerSection.cacheInstances[mixingroomId] = section;
+    return section;
   }
 
   connectedCallback() {
-    // this.seedList();
-    this._initializemixerList();
+    this.form.addEventListener("submitSucces", this.#formSubmitHandler);
+  }
 
-    this.form.addEventListener("submitSucces", (event) => {
-      const mixer = event.detail.data;
-      console.log("mixer", mixer);
-      this._addMixer(mixer);
-
-      this.form.hidePopover();
-      console.log(this.form);
-    });
+  disconnectedCallback() {
+    this.form.removeEventListener("submitSucces", this.#formSubmitHandler);
   }
 
   async _initializemixerList() {
     const { mixingroomId } = new Router().getParams();
+
     const mixers = await Mixer.find({ mixingroomId: Number(mixingroomId) });
 
     this.mixerListElement.innerHTML = "";
@@ -34,8 +51,6 @@ export default class MixerSection extends WebComponent {
     for (const mixer of mixers) {
       this._addMixer(mixer);
     }
-
-    console.log("mixers", mixers);
   }
 
   _addMixer(mixer) {
@@ -47,7 +62,10 @@ export default class MixerSection extends WebComponent {
     mixerELement.mixer = mixer;
     this.mixerListElement.appendChild(mixerELement);
 
-    if (this.mixerListElement.children.length >= 5 && this.formbutton.hasAttribute("popovertarget")) {
+    if (
+      this.mixerListElement.children.length >= 5 &&
+      this.formbutton.hasAttribute("popovertarget")
+    ) {
       this.formbutton.removeAttribute("popovertarget");
       this.formbutton.addEventListener("click", (event) => {
         new Notification("You can only have 5 mixers per mixing room", "error");

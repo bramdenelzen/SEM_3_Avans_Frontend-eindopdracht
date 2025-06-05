@@ -13,7 +13,6 @@ export default class Layout extends WebComponent {
     const nav = this.shadowRoot.querySelector("nav");
 
     const currentPath = new Router().getCurrentPath();
-    console.log(currentPath);
     if (currentPath === "/"){
       this.shadowRoot.getElementById("home-link").classList.add("active");
     }else if (currentPath === "/colortesting"){
@@ -28,7 +27,6 @@ export default class Layout extends WebComponent {
       if ("/mixingroom/" + mixingRoom.id === currentPath) {
         mixingRoomLink.classList.add("active");
       }
-
       nav.appendChild(mixingRoomLink);
     }
   }
