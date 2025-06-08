@@ -3,6 +3,7 @@ import MixerModel from "../../../database/models/Mixer.js";
 import { Notification } from "../../../services/Notifications.js";
 import Jar from "../../../database/models/Jar.js";
 import ResultColor from "../../../database/models/ResultColor.js";
+import Weather from "../../../services/Weather.js";
 
 export default class Mixer extends WebComponent {
   #mixer;
@@ -47,6 +48,32 @@ export default class Mixer extends WebComponent {
 
   async _drophandler(event) {
     event.preventDefault();
+
+    if (Weather.weatherEffects.state.maxMixingMachines) {
+      const allMixers = await MixerModel.find({
+        mixingroomId: this.#mixer.mixingroomId,
+      });
+
+      const totalWorkingMixers = allMixers.filter(
+        (mixer) => mixer.jarId != null && mixer.jarId != undefined
+      ).length;
+
+      if (
+        totalWorkingMixers >= Weather.weatherEffects.state.maxMixingMachines
+      ) {
+        console.log(
+          Weather.weatherEffects.state.maxMixingMachines,
+          totalWorkingMixers,
+          allMixers
+        );
+        new Notification(
+          `You can only have ${Weather.weatherEffects.state.maxMixingMachines} mixers working at the same time due to the current weather conditions.`,
+          "error"
+        );
+        return;
+      }
+    }
+
     try {
       const dropEventJSON = JSON.parse(
         event.dataTransfer.getData("text/plain")
@@ -59,6 +86,7 @@ export default class Mixer extends WebComponent {
       if (!dropEventJSON) {
         throw new Error("Something went wrong with the drop event");
       }
+
       if (!dropEventJSON.jar) {
         throw new Error("You can only drop jars on a mixer");
       }

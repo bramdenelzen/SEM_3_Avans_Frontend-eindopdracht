@@ -2,6 +2,7 @@ import Mixer from "../../../database/models/Mixer.js";
 import Router from "../../../services/Router.js";
 import WebComponent from "../../Webcomponent.js";
 import { Notification } from "../../../services/Notifications.js";
+import Weather from "../../../services/Weather.js";
 
 export default class MixerSection extends WebComponent {
   constructor() {
@@ -11,6 +12,7 @@ export default class MixerSection extends WebComponent {
     this.mixerListElement = this.shadowRoot.getElementById("mixer-list");
     this._initializemixerList();
     console.log("MixerSection initialized");
+    Weather.weatherEffects.subscribe(this._updateWarning.bind(this));
   }
   static cacheInstances = [];
 
@@ -75,6 +77,36 @@ export default class MixerSection extends WebComponent {
         new Notification("You can only have 5 mixers per mixing room", "error");
       });
       this.formbutton.setAttribute("popovertarget", "mixer-form");
+    }
+    this._updateWarning();
+  }
+
+  async _updateWarning() {
+    const { mixingroomId } = new Router().getParams();
+    const mixers = await Mixer.find({ mixingroomId: Number(mixingroomId) });
+    const warningElement = this.shadowRoot.getElementById("warning");
+
+    console.log(
+      "mixers",
+      mixers.length,
+      Weather.weatherEffects.state.maxMixingMachines
+    );
+    if (Weather.weatherEffects.state.maxMixingMachines > mixers.length) {
+      warningElement.style.display = "none";
+      warningElement.textContent = "";
+    } else {
+      warningElement.style.display = "block";
+      warningElement.textContent = `You can only have ${
+        Weather.weatherEffects.state.maxMixingMachines
+      } mixer${
+        Weather.weatherEffects.state.maxMixingMachines !== 1 ? "s" : ""
+      } working in this mixing room due to weather effects.`;
+    }
+
+    if (mixers.length >= 5) {
+      warningElement.style.display = "block";
+      warningElement.textContent =
+        "You have reached the maximum number of mixers (5) for this mixing room.";
     }
   }
 }

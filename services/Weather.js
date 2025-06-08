@@ -3,6 +3,7 @@ import State from "./State.js";
 export default class Weather {
   static currentWeather = new State("weather", null);
   static location = new State("locaton", null);
+  static weatherEffects = new State("weatherEffects", null);
 
   static async configure(apiKey) {
     Weather.apiKey = apiKey;
@@ -22,7 +23,7 @@ export default class Weather {
     });
 
     await Weather.updateCurrentWeather(location);
-    return true; 
+    return true;
   }
 
   static async updateCurrentWeather(location) {
@@ -32,7 +33,7 @@ export default class Weather {
       );
     }
 
-    let query = location
+    let query = location;
 
     if (!location) {
       throw new Error("Location must be provided.");
@@ -58,15 +59,49 @@ export default class Weather {
       longitude: data.location.lon,
     });
 
-    Weather.currentWeather.setState(data.current)
-    console.log("Current weather updated:", data);
+    Weather.currentWeather.setState(data.current);
+    
+    Weather._updateWeatherEffects();
+  }
+
+  static _updateWeatherEffects() {
+    /**
+     * - [ ] Als het regent of sneeuwt, wordt de mengtijd met 10% verhoogd.
+- [ ] Bij een temperatuur boven de 35 graden mag er maximaal per hal 1 mengmachine draaien.
+- [ ] Als de temperatuur onder de 10 graden ligt, wordt de mengtijd met 15% verhoogd.
+     */
+
+    let mixingTimeMultiplier = 1;
+    let maxMixingMachines = 5;
+
+    const weather = Weather.currentWeather.state;
+    if (!weather) {
+      Weather.weatherEffects.setState({
+        mixingTimeMultiplier,
+        maxMixingMachines,
+      });
+      return;
+    }
+
+    if (
+      weather.condition.text.toLowerCase().includes("rain") ||
+      weather.condition.text.toLowerCase().includes("snow")
+    ) {
+      mixingTimeMultiplier *= 1.1;
+    }
+    if (weather.temp_c > 35) {
+      maxMixingMachines = 1;
+    } else if (weather.temp_c < 10) {
+      mixingTimeMultiplier *= 1.15;
+    }
+
+    Weather.weatherEffects.setState({
+      mixingTimeMultiplier,
+      maxMixingMachines,
+    });
   }
 
   constructor() {
-    if (!Weather.apiKey) {
-      throw new Error(
-        "Weather API key is not configured. Please call Weather.configure(apiKey) first."
-      );
-    }
+    throw new Error("Weather is a static class and cannot be instantiated.");
   }
 }

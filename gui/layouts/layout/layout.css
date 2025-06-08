@@ -28,15 +28,10 @@ nav {
   align-items: center;
 }
 
-.header-left{
+.header-left {
   display: flex;
   align-items: center;
   gap: 40px;
-}
-.weather-info{
-  display: flex;
-  align-items: center;
-  gap: 10px;
 }
 
 .logo {
@@ -56,13 +51,18 @@ nav {
   object-fit: contain;
 }
 
+.weather-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
 
 #weather {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 5px;
 
-  & >img {
+  & > img {
     width: 30px;
     height: 30px;
   }
