@@ -4,6 +4,7 @@ import WebComponent from "../../Webcomponent.js";
 import { Notification } from "../../../services/Notifications.js";
 import JarModel from "../../../database/models/Jar.js";
 import Mixer from "../../../database/models/Mixer.js";
+import Weather from "../../../services/Weather.js";
 
 export default class Jar extends WebComponent {
   #layers = [];
@@ -22,6 +23,8 @@ export default class Jar extends WebComponent {
     this.#layers.push(this.shadowRoot.getElementById("layer-3"));
     this.#layers.push(this.shadowRoot.getElementById("layer-2"));
     this.#layers.push(this.shadowRoot.getElementById("layer-1"));
+
+    Weather.weatherEffects.subscribe(this.updateSpecs.bind(this));
   }
 
   connectedCallback() {
@@ -126,12 +129,24 @@ export default class Jar extends WebComponent {
   updateSpecs() {
     const mixingSpeed = this.shadowRoot.getElementById("mixing-speed");
     const minMixingTime = this.shadowRoot.getElementById("min-mixing-time");
+    console.log("Updating specs for jar:", Weather.weatherEffects.state);
+
+    if (this.#ingredients.length === 0) {
+      return
+    }
 
     mixingSpeed.innerText = this.#mixingSpeed
       ? `Mixing Speed: ${this.#mixingSpeed} RPM`
       : "";
 
-    minMixingTime.innerText = `Min mixing Time: ${this.#minMixingTime} sec`;
+    let multiplierText = "";
+    Weather.weatherEffects.state.mixingTimeMultiplier > 1
+      ? (multiplierText = ` (x${Weather.weatherEffects.state.mixingTimeMultiplier})`)
+      : "";
+
+    minMixingTime.innerText = `Min mixing Time: ${
+      this.#minMixingTime
+    } sec ${multiplierText}`;
   }
 
   updateLayers() {

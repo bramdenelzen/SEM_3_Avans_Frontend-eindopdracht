@@ -91,7 +91,7 @@ export default class MixerSection extends WebComponent {
       mixers.length,
       Weather.weatherEffects.state.maxMixingMachines
     );
-    if (Weather.weatherEffects.state.maxMixingMachines > mixers.length) {
+    if (Weather.weatherEffects.state.maxMixingMachines >= mixers.length) {
       warningElement.style.display = "none";
       warningElement.textContent = "";
     } else {
@@ -101,12 +101,6 @@ export default class MixerSection extends WebComponent {
       } mixer${
         Weather.weatherEffects.state.maxMixingMachines !== 1 ? "s" : ""
       } working in this mixing room due to weather effects.`;
-    }
-
-    if (mixers.length >= 5) {
-      warningElement.style.display = "block";
-      warningElement.textContent =
-        "You have reached the maximum number of mixers (5) for this mixing room.";
     }
   }
 }
