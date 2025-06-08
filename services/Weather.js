@@ -6,6 +6,7 @@ export default class Weather {
     const location = await new Promise((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
+            console.log("Geolocation position:", position);
           resolve({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
@@ -15,10 +16,7 @@ export default class Weather {
       );
     });
 
-    console.log(location);
     Weather.currentWeather = await Weather.fetchCurrentWeather(location);
-
-    console.log(Weather.currentWeather);
   }
 
   static async fetchCurrentWeather(location) {
@@ -27,8 +25,6 @@ export default class Weather {
         "Weather API key is not configured. Please call Weather.configure(apiKey) first."
       );
     }
-
-    console.log(location);
 
     if (!location || !location.latitude || !location.longitude) {
       throw new Error("Location must be provided with latitude and longitude.");
@@ -44,6 +40,14 @@ export default class Weather {
     }
 
     const data = await response.json();
+
+    Weather.location = {
+      city: data.location.name,
+      country: data.location.country,
+      latitude: data.location.lat,
+      longitude: data.location.lon,
+    };
+    
     return data.current
   }
 

@@ -1,13 +1,37 @@
 import MixingRoom from "../../../database/models/MixingRoom.js";
 import Router from "../../../services/Router.js";
+import Weather from "../../../services/Weather.js";
 import WebComponent from "../../Webcomponent.js";
 
 export default class Layout extends WebComponent {
   constructor() {
     super();
+    this._initializeLayout();
   }
 
-  async connectedCallback() {
+  async _initializeLayout() {
+    const location = Weather.location;
+    if (location) {
+      const locationElement = this.shadowRoot.getElementById("location");
+      locationElement.innerText = `${location.city}, ${location.country}`;
+    }
+
+    const weather = Weather.currentWeather;
+
+    if (weather) {
+
+      console.log("weather", weather);
+      const weatherElement = this.shadowRoot.getElementById("weather");
+      weatherElement.innerText = `${weather.temp_c}°C, ${weather.condition.text}`
+
+      const icon = document.createElement("img");
+      icon.src = weather.condition.icon;
+      weatherElement.appendChild(
+        icon
+      );
+    }
+
+
     const mixingRooms = await MixingRoom.find({});
 
     const nav = this.shadowRoot.querySelector("nav");
