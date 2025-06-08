@@ -3,26 +3,28 @@ import State from "./State.js";
 export default class Weather {
   static currentWeather = new State("weather", null);
   static location = new State("locaton", null);
-  static weatherEffects = new State("weatherEffects", null);
+  static weatherEffects = new State("weatherEffects", {
+    mixingTimeMultiplier: 1,
+    maxMixingMachines: 5,});
 
   static async configure(apiKey) {
     Weather.apiKey = apiKey;
 
     // Wrap geolocation in a Promise
     const location = await new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          console.log("Geolocation position:", position);
-          resolve({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-        },
-        (error) => reject(error)
-      );
+      navigator.geolocation.getCurrentPosition((position) => {
+        console.log("Geolocation position:", position);
+        resolve({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+      });
+      resolve(null);
     });
 
-    await Weather.updateCurrentWeather(location);
+    if (location) {
+      await Weather.updateCurrentWeather(location);
+    }
     return true;
   }
 
@@ -60,7 +62,7 @@ export default class Weather {
     });
 
     Weather.currentWeather.setState(data.current);
-    
+
     Weather._updateWeatherEffects();
   }
 
@@ -71,8 +73,8 @@ export default class Weather {
 - [ ] Als de temperatuur onder de 10 graden ligt, wordt de mengtijd met 15% verhoogd.
      */
 
-    let mixingTimeMultiplier = 1;
-    let maxMixingMachines = 5;
+    let mixingTimeMultiplier = Weather.weatherEffects.state.mixingTimeMultiplier
+    let maxMixingMachines = Weather.weatherEffects.state.maxMixingMachines;
 
     const weather = Weather.currentWeather.state;
     if (!weather) {
