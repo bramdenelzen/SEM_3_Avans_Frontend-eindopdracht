@@ -7,7 +7,7 @@ export default class IngredientListItem extends WebComponent {
   #ingredient;
 
   constructor() {
-    super(IngredientListItem.html, IngredientListItem.css);
+    super();
 
     this.shadowRoot
       .querySelector("div")

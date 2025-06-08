@@ -7,7 +7,7 @@ import { Notification } from "../../../services/Notifications.js";
 
 export default class ColorTesting extends WebComponent {
   constructor() {
-    super(ColorTesting.html, ColorTesting.css);
+    super();
     this.selectedColor = new State("selectedColor", null);
 
     const columns = 6;

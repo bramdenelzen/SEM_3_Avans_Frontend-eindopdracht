@@ -3,7 +3,7 @@ import WebComponent from "../../Webcomponent.js";
 
 export default class ToastList extends WebComponent {
   constructor() {
-    super(ToastList.html, ToastList.css);
+    super();
     Notifications.onChange(this._manageToasts.bind(this));
   }
 

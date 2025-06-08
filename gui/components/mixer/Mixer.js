@@ -11,7 +11,7 @@ export default class Mixer extends WebComponent {
   #dropHandler;
 
   constructor() {
-    super(Mixer.html, Mixer.css);
+    super();
 
     this.#dragoverHandler = (event) => {
       event.preventDefault();

@@ -3,7 +3,7 @@ import WebComponent from "../../Webcomponent.js";
 
 export default class Shelf extends WebComponent {
   constructor() {
-    super(Shelf.html, Shelf.css);
+    super();
   }
 
   connectedCallback() {

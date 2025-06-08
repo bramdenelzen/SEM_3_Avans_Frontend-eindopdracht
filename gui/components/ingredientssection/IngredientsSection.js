@@ -1,6 +1,5 @@
 import WebComponent from "../../Webcomponent.js";
 import IngredientModel from "../../../database/models/Ingredient.js";
-import IngredientListItem from "../ingredientListItem/IngredientListItem.js";
 import Ingredient from "../../../database/models/Ingredient.js";
 import MixingRoom from "../../../database/models/MixingRoom.js";
 import Router from "../../../services/Router.js";
@@ -8,7 +7,7 @@ import { Notification } from "../../../services/Notifications.js";
 
 export default class IngredientsSection extends WebComponent {
   constructor() {
-    super(IngredientsSection.html, IngredientsSection.css);
+    super();
   }
 
   async connectedCallback() {

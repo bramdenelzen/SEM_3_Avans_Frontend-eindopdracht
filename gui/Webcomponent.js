@@ -5,8 +5,16 @@ export default class WebComponent extends HTMLElement {
    * @param {string} html
    * @param {CSSStyleSheet} css
    */
-  constructor(html, css) {
+  constructor() {
     super();
+    const html = this.constructor.html
+    const css = this.constructor.css;
+
+    if (!html || !css) {
+      throw new Error(
+        `WebComponent ${this.constructor.name} is missing html and/or css. Please define them as static properties.`
+      );
+    }
 
     this.attachShadow({ mode: "open" });
 

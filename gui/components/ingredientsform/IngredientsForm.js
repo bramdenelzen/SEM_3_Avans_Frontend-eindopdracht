@@ -7,7 +7,7 @@ export default class IngredientsForm extends WebComponent {
   #submitHandler
 
   constructor() {
-    super(IngredientsForm.html, IngredientsForm.css);
+    super();
 
     this.formElement = this.shadowRoot.querySelector("form");
     this.errorElement = this.shadowRoot.getElementById("error");

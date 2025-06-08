@@ -5,7 +5,7 @@ import { Notification } from "../../../services/Notifications.js";
 
 export default class MixerSection extends WebComponent {
   constructor() {
-    super(MixerSection.html, MixerSection.css);
+    super();
     this.form = this.shadowRoot.getElementById("mixer-form");
     this.formbutton = this.shadowRoot.getElementById("add-mixer-button");
     this.mixerListElement = this.shadowRoot.getElementById("mixer-list");

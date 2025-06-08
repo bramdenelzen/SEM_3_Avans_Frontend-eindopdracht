@@ -5,7 +5,7 @@ import Mixer from "../../../database/models/Mixer.js";
 
 export default class JarsSection extends WebComponent {
   constructor() {
-    super(JarsSection.html, JarsSection.css);
+    super();
   }
 
   connectedCallback() {

@@ -3,7 +3,7 @@ import WebComponent from "../../Webcomponent.js";
 
 export default class EndResults extends WebComponent {
   constructor() {
-    super(EndResults.html, EndResults.css);
+    super();
     this.renderList();
 
     ResultColor.subscribeToModel(this.renderList.bind(this));

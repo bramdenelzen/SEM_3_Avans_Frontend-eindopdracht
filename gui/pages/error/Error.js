@@ -2,7 +2,7 @@ import WebComponent from "../../Webcomponent.js";
 
 export default class Error extends WebComponent{
     constructor(){
-        super(Error.html, Error.css)
+        super()
     }
 
     connectedCallback(){

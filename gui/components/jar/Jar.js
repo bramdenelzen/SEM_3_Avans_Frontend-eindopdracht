@@ -17,7 +17,7 @@ export default class Jar extends WebComponent {
   #minMixingTime = null;
 
   constructor() {
-    super(Jar.html, Jar.css);
+    super();
 
     this.#layers.push(this.shadowRoot.getElementById("layer-3"));
     this.#layers.push(this.shadowRoot.getElementById("layer-2"));

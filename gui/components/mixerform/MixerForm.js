@@ -8,7 +8,7 @@ export default class MixerForm extends WebComponent {
   #submitHandler;
 
   constructor() {
-    super(MixerForm.html, MixerForm.css);
+    super();
 
     this.#submitHandler = this.submitHandler.bind(this);
     this.formElement = this.shadowRoot.querySelector("form");

@@ -4,7 +4,7 @@ export default class Toast extends WebComponent {
   #type;
 
   constructor() {
-    super(Toast.html, Toast.css);
+    super();
   }
 
   connectedCallback() {

@@ -5,7 +5,7 @@ import MixerSection from "../../components/mixersection/MixerSection.js";
 
 export default class MixingRoom extends WebComponent {
   constructor() {
-    super(MixingRoom.html, MixingRoom.css);
+    super();
     this._initializemixingRoom()
   }
 
