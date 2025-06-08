@@ -6,10 +6,11 @@ import MixerSection from "../../components/mixersection/MixerSection.js";
 export default class MixingRoom extends WebComponent {
   constructor() {
     super(MixingRoom.html, MixingRoom.css);
+    this._initializemixingRoom()
   }
 
-  async connectedCallback() {
-    const { mixingroomId } = new Router().getParams();
+  async _initializemixingRoom(){
+      const { mixingroomId } = new Router().getParams();
     const mixingRoomRecord = await MixingRoomModel.findById(
       Number(mixingroomId)
     );

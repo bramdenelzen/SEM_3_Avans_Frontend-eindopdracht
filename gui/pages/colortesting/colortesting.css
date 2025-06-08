@@ -1,9 +1,13 @@
 .grid-row {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+
   align-items: center;
   gap: 10px;
+}
+
+.grid-row > * {
+  flex: 1;
 }
 
 #grid{
@@ -12,15 +16,24 @@
     gap: 10px;
 }
 
-x-colortestingcell {
-  width: 100%;
-  height: 100%;
-  aspect-ratio: 1 / 1;
-  border: 1px solid var(--base-100);
-}
-
 .grid-cols-2 {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
+}
+
+#color-palette {
+  height: 50px;
+  width: 100%;
+  border: 1px solid var(--base-100);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+section {
+    padding-bottom: var(--section-padding-md);
+    padding-top: var(--section-padding-md)
 }

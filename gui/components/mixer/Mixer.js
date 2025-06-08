@@ -56,14 +56,13 @@ export default class Mixer extends WebComponent {
         new Notification("Mixer is already mixing", "error");
         return;
       }
-
       if (!dropEventJSON) {
         throw new Error("Something went wrong with the drop event");
-      } else if (!dropEventJSON.jar) {
+      }
+      if (!dropEventJSON.jar) {
         throw new Error("You can only drop jars on a mixer");
       }
       if (dropEventJSON.jar.mixingSpeed !== this.#mixer.mixingSpeed) {
-        console.log(dropEventJSON.jar, this.#mixer);
         throw new Error(
           `You can only drop jars with a mixing speed of ${
             this.#mixer.mixingSpeed
@@ -86,7 +85,7 @@ export default class Mixer extends WebComponent {
       this.#mixer.jarId = parseInt(jar.id);
       await this.#mixer.save();
 
-      const averageColor = this.getAverageColorHex(
+      const averageColor = this._getAverageColorHex(
         jar.ingredients.map((ingredient) => ingredient.colorHexcode)
       );
 
@@ -111,7 +110,7 @@ export default class Mixer extends WebComponent {
             progressBarFill.style.width = "0%";
             resolve();
           }
-        }, 50); 
+        }, 50);
       });
 
       const resultDbRecord = new ResultColor({ colorHexcode: averageColor });
@@ -139,13 +138,12 @@ export default class Mixer extends WebComponent {
     }
   }
 
-  getAverageColorHex(colors) {
+  _getAverageColorHex(colors) {
     let totalR = 0,
       totalG = 0,
       totalB = 0;
 
     colors.forEach((hex) => {
-    
       hex = hex.replace(/^#/, "");
 
       const r = parseInt(hex.substring(0, 2), 16);

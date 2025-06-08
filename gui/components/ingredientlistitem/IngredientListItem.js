@@ -1,4 +1,5 @@
 import Ingredient from "../../../database/models/Ingredient.js";
+import Color from "../../../services/Color.js";
 import { Notification } from "../../../services/Notifications.js";
 import WebComponent from "../../Webcomponent.js";
 
@@ -38,7 +39,7 @@ export default class IngredientListItem extends WebComponent {
       throw new Error("Ingredient is not set");
     }
 
-    this.shadowRoot.getElementById("color-hexcode").innerText =
+    this.shadowRoot.getElementById("color-hexcode").innerText = 
       this.#ingredient.colorHexcode;
 
     const colorField = this.shadowRoot.getElementById("color");
@@ -46,7 +47,7 @@ export default class IngredientListItem extends WebComponent {
     colorField.classList.add("texture-" + this.#ingredient.texture);
     this.shadowRoot.getElementById("min-mixing-time").innerText = `${
       this.#ingredient.minMixingTime
-    } min`;
+    } sec`;
     this.shadowRoot.getElementById("min-mixing-speed").innerText = `${
       this.#ingredient.minMixingSpeed
     } rpm`;

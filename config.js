@@ -8,22 +8,11 @@ import MixingRoomSeeder from "./database/seeders/MixingRoomSeeder.js";
 import Home from "./gui/pages/home/Home.js";
 
 export default {
-  // Database configuration
-  Db: {
-    handler: LocalStorageDB,
-    seeders: [
-      MixingRoomSeeder,
-      MixerSeeder,
-      JarSeeder,
-      IngredientSeeder
-    ]
-  },
   Router: {
     routes: {
-      "/": `<x-home></x-home>`,
-      "/about": `<x-mixingroom></x-mixingroom>`,
-      "/mixingroom/{mixingroomId}": `<x-mixingroom></x-mixingroom>`,
-      "/colortesting": `<x-colortesting></x-colortesting>`,
+      "/": document.createElement("x-home"),
+      "/mixingroom/{mixingroomId}": "<x-mixingroom></x-mixingroom>",
+      "/colortesting": document.createElement("x-colortesting"),
     },
   },
   Gui: {
@@ -47,5 +36,8 @@ export default {
       layouts: ["Layout"],
     },
   },
-  debug: true,
+  Db: {
+    handler: LocalStorageDB,
+    seeders: [MixingRoomSeeder, MixerSeeder, JarSeeder, IngredientSeeder],
+  },
 };

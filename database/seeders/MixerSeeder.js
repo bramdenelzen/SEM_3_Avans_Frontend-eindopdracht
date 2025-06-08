@@ -7,9 +7,25 @@ export default class MixerSeeder extends BaseSeeder {
     let mixers = await Mixer.find({});
     mixers.forEach(async (mixer) => {
       if (mixer.jarId) {
-        mixer.jarId = null; // Reset jarId to null
-        await mixer.save(); // Save the changes
+        mixer.jarId = null; 
+        await mixer.save(); 
       }
     });
+
+    const mixingRooms = await MixingRoom.find({});
+    const mixersPerRoom = 2; 
+
+    for (const room of mixingRooms) {
+      const existingMixers = await Mixer.find({ mixingroomId: room.id });
+      const mixersToAdd = mixersPerRoom - existingMixers.length;
+
+      for (let i = 0; i < mixersToAdd; i++) {
+        const mixer = new Mixer({
+          mixingroomId: room.id,
+          mixingSpeed:  10 * (i+1), 
+        });
+        await mixer.save();
+      }
+    }
   }
 }

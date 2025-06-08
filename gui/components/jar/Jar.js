@@ -59,14 +59,12 @@ export default class Jar extends WebComponent {
     this.#jar.subscribeToInstance(this.update.bind(this));
 
     Mixer.subscribeToModel((data, type) => {
-      if (this.#jar.id=== data.jarId){
+      if (this.#jar.id === data.jarId) {
         this.shadowRoot.getElementById("jar").classList.add("mixing");
         this.#currentMixer = data.id;
-        console.log("Jar is now mixing with mixer ID:", data.id);
-      } else if (this.#currentMixer == data.id && data.jarId === null){
+      } else if (this.#currentMixer == data.id && data.jarId === null) {
         this.shadowRoot.getElementById("jar").classList.remove("mixing");
         this.#currentMixer = null;
-        console.log("Jar is no longer mixing");
       }
     });
   }
@@ -176,8 +174,12 @@ export default class Jar extends WebComponent {
         event.dataTransfer.getData("text/plain")
       );
 
-      if (!dropEventJSON || !dropEventJSON.ingredientId) {
-        throw new Error("Invalid ingredient data in drop event");
+      if (!dropEventJSON) {
+        throw new Error("Invalid drop event data");
+      }
+
+      if (!dropEventJSON.ingredientId) {
+        throw new Error("Can only drop ingredients on a jar");
       }
 
       const ingredientId = dropEventJSON.ingredientId;

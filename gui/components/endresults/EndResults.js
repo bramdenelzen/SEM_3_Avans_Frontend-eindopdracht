@@ -6,8 +6,7 @@ export default class EndResults extends WebComponent {
     super(EndResults.html, EndResults.css);
     this.renderList();
 
-    ResultColor.subscribeToModel(
-      this.renderList.bind(this))
+    ResultColor.subscribeToModel(this.renderList.bind(this));
   }
   async renderList() {
     const resultsList = this.shadowRoot.getElementById("results-list");
@@ -27,6 +26,19 @@ export default class EndResults extends WebComponent {
       listItem.textContent = `Color: ${result.colorHexcode}`;
       listItem.style.backgroundColor = result.colorHexcode;
       resultsList.appendChild(listItem);
+
+      listItem.draggable = true;
+
+      listItem.addEventListener("dragstart", (event) => {
+        event.dataTransfer.setData(
+          "text/plain",
+          JSON.stringify({
+            color: {
+              hexCode: result.colorHexcode,
+            },
+          })
+        );
+      });
     });
   }
 }

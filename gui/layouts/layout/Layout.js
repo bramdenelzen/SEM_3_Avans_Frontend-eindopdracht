@@ -13,16 +13,22 @@ export default class Layout extends WebComponent {
     const nav = this.shadowRoot.querySelector("nav");
 
     const currentPath = new Router().getCurrentPath();
-    if (currentPath === "/"){
+    if (currentPath === "/") {
       this.shadowRoot.getElementById("home-link").classList.add("active");
-    }else if (currentPath === "/colortesting"){
-      this.shadowRoot.getElementById("colortesting-link").classList.add("active");
+    } else if (currentPath === "/colortesting") {
+      this.shadowRoot
+        .getElementById("colortesting-link")
+        .classList.add("active");
     }
 
     for (const mixingRoom of mixingRooms) {
+      if (this.shadowRoot.getElementById(mixingRoom.id)) {
+        continue;
+      }
       const mixingRoomLink = document.createElement("a");
       mixingRoomLink.href = `#/mixingroom/${mixingRoom.id}`;
       mixingRoomLink.innerText = mixingRoom.displayName;
+      mixingRoomLink.id = mixingRoom.id;
 
       if ("/mixingroom/" + mixingRoom.id === currentPath) {
         mixingRoomLink.classList.add("active");

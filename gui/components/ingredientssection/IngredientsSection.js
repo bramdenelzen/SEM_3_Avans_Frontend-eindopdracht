@@ -35,7 +35,6 @@ export default class IngredientsSection extends WebComponent {
 
     this.seedList();
     
-    
     IngredientModel.subscribeToModel(
       async function (data, type) {
         if (type !== "create") {
@@ -44,7 +43,6 @@ export default class IngredientsSection extends WebComponent {
           const ingredientListItemElement = document.createElement(
             "x-ingredientlistitem"
           );
-          console.log(data)
           ingredientListItemElement.ingredient = ingredient;
 
           this.ingredientListElement.prepend(ingredientListItemElement);

@@ -21,9 +21,7 @@ export default class Router {
   }
 
   matchRoute(path) {
-    for (const [routePath, routeContent] of Object.entries(
-      this.routes
-    )) {
+    for (const [routePath, routeContent] of Object.entries(this.routes)) {
       const paramNames = [];
       const regexPattern = routePath.replace(/{([^}]+)}/g, (_, name) => {
         paramNames.push(name);
@@ -52,7 +50,18 @@ export default class Router {
       this.currentParams = match.params; // <-- Update current params
 
       const html = match.routeContent;
-      this.appElement.innerHTML = html;
+
+      if (typeof html === "function") {
+        this.appElement.innerHTML = ""; // Clear previous content
+        this.appElement.appendChild(html);
+      }else if (typeof html === "string") {
+        this.appElement.innerHTML = html;
+      } else if (html instanceof HTMLElement) {
+        this.appElement.innerHTML = ""; // Clear previous content
+        this.appElement.appendChild(html);
+      } else {
+        console.error("Invalid route content:", html);
+      }
     } else {
       this.appElement.innerHTML = `<x-error status="404" message="Not found"></x-error>`;
     }

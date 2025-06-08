@@ -1,4 +1,7 @@
 export default class State {
+
+  #subscribers = []
+
   constructor(stateName,initialState = null) {
     this._state = initialState;
     this._stateName = stateName;
@@ -22,10 +25,21 @@ export default class State {
   }
 
   _notify() {
-    const event = new CustomEvent(this._stateName + "Change", {
-      detail: this._state,
+   this.#subscribers.forEach((callback) => {
+      const event = new CustomEvent(this._stateName + "Change", {
+        detail: this._state,
+      });
+
+      document.dispatchEvent(event);
+      
+      callback(event);
     });
-    console.log("State changed:", this._stateName, this._state);
-    document.dispatchEvent(event);
+  }
+
+  subscribe(callback) {
+    if (typeof callback !== "function") {
+      throw new Error("Callback must be a function");
+    }
+    this.#subscribers.push(callback);
   }
 }

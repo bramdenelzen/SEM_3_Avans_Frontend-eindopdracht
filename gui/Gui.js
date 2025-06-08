@@ -46,7 +46,7 @@ export default class Gui {
       );
 
       this.loaded = true;
-      console.log(this.loaded)
+      console.log(this.loaded);
     });
   }
 
@@ -56,7 +56,7 @@ export default class Gui {
    * @description This method is used to define components in the app.
    */
   async _defineWebComponents(basePath, webComponents) {
-    console.log("loaded: ", basePath,  this.loaded);
+    console.log("loaded: ", basePath, this.loaded);
     if (Array.isArray(webComponents)) {
       webComponents.forEach(async (componentName) => {
         try {
