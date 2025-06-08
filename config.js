@@ -19,6 +19,7 @@ export default {
     registeredGuiFiles: {
       components: [
         "IngredientsSection",
+        "WeatherForm",
         "IngredientsForm",
         "IngredientListItem",
         "Jar",

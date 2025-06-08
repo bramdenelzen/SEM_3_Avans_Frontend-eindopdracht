@@ -10,28 +10,11 @@ export default class Layout extends WebComponent {
   }
 
   async _initializeLayout() {
-    const location = Weather.location;
-    if (location) {
-      const locationElement = this.shadowRoot.getElementById("location");
-      locationElement.innerText = `${location.city}, ${location.country}`;
-    }
+    Weather.location.subscribe(this._updateLocation.bind(this));
+    Weather.currentWeather.subscribe(this._updateWeather.bind(this));
 
-    const weather = Weather.currentWeather;
-
-    if (weather) {
-
-      console.log("weather", weather);
-      const weatherElement = this.shadowRoot.getElementById("weather");
-      weatherElement.innerText = `${weather.temp_c}°C, ${weather.condition.text}`
-
-      const icon = document.createElement("img");
-      icon.src = weather.condition.icon;
-      weatherElement.appendChild(
-        icon
-      );
-    }
-
-
+    this._updateLocation();
+    this._updateWeather();
     const mixingRooms = await MixingRoom.find({});
 
     const nav = this.shadowRoot.querySelector("nav");
@@ -58,6 +41,28 @@ export default class Layout extends WebComponent {
         mixingRoomLink.classList.add("active");
       }
       nav.appendChild(mixingRoomLink);
+    }
+  }
+
+  _updateLocation() {
+    const location = Weather.location.state;
+    if (location) {
+      const locationElement = this.shadowRoot.getElementById("location");
+      locationElement.innerText = `${location.city}, ${location.country}`;
+    }
+  }
+
+  _updateWeather() {
+    const weather = Weather.currentWeather.state;
+
+    if (weather) {
+      console.log("weather", weather);
+      const weatherElement = this.shadowRoot.getElementById("weather");
+      weatherElement.innerText = `${weather.temp_c}°C, ${weather.condition.text}`;
+
+      const icon = document.createElement("img");
+      icon.src = weather.condition.icon;
+      weatherElement.appendChild(icon);
     }
   }
 }

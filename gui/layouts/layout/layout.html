@@ -2,16 +2,23 @@
   <div class="container">
     <div class="header-left">
       <a class="logo" href="/#"><img src="../../../assets/favicon.png" /></a>
-      <div class="weather-info">
-        <p id="location"></p>
-        -
-        <p id="weather"></p>
-      </div>
+      <nav>
+        <a id="home-link" href="/#">Home</a>
+        <a id="colortesting-link" href="/#/colortesting">Color Testing</a>
+      </nav>
     </div>
-    <nav>
-      <a id="home-link" href="/#">Home</a>
-      <a id="colortesting-link" href="/#/colortesting">Color Testing</a>
-    </nav>
+    <div class="weather-info">
+      <x-weatherform
+        class="popover"
+        popover="manual"
+        id="weather-form"
+      ></x-weatherform>
+
+      <p id="weather"></p>
+      -
+      <p id="location"></p>
+      <button class="btn secondary" popovertarget="weather-form">Set location</button>
+    </div>
   </div>
 </header>
 <main>
