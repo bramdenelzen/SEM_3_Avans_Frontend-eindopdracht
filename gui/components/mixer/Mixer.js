@@ -117,16 +117,17 @@ export default class Mixer extends WebComponent {
         jar.ingredients.map((ingredient) => ingredient.colorHexcode)
       );
 
-      const duration = jar.mixingTime * 1000 * Weather.weatherEffects.state.mixingTimeMultiplier;
+      const duration =
+        jar.mixingTime *
+        1000 *
+        Weather.weatherEffects.state.mixingTimeMultiplier;
       const progressBarFill =
         this.shadowRoot.getElementById("progress-bar-fill");
       let start = Date.now();
 
-      console.log(duration)
+      console.log(duration);
 
-      this.style.animation = `mixing-speed ${
-        duration / 1000
-      }s linear infinite`;
+      this.style.animation = `mixing-speed ${duration / 1000}s linear infinite`;
 
       await new Promise((resolve) => {
         const interval = setInterval(() => {
@@ -150,9 +151,14 @@ export default class Mixer extends WebComponent {
         throw new Error("Failed to save result color to database");
       }
 
-      const jarRecord = await Jar.findById(jar.id);
-      jarRecord.delete();
+      try {
+        const jarRecord = await Jar.findById(jar.id);
 
+        jarRecord.delete();
+      } catch (error) {
+        resultDbRecord.delete();
+        throw new Error(`Failed to delete jar from database: ${error.message}`);
+      }
       progressBarFill.style.animation = "none";
       this.style.animation = "none";
 

@@ -1,11 +1,16 @@
 import LocalStorageDB from "./database/handlers/LocalStorageDB.js";
 import RuntimeDBStorage from "./database/handlers/RuntimeStorageDB.js";
 import SessionStorageDB from "./database/handlers/SessionStorageDB.js";
+import Mixer from "./database/models/Mixer.js";
+import MixingRoom from "./database/models/MixingRoom.js";
+import Jar from "./database/models/Jar.js";
+import JarHasIngredient from "./database/models/JarHasIngredient.js";
 import IngredientSeeder from "./database/seeders/IngredientSeeder.js";
 import JarSeeder from "./database/seeders/JarSeeder.js";
 import MixerSeeder from "./database/seeders/MixerSeeder.js";
 import MixingRoomSeeder from "./database/seeders/MixingRoomSeeder.js";
 import Home from "./gui/pages/home/Home.js";
+import ResultColor from "./database/models/ResultColor.js";
 
 export default {
   Router: {
@@ -40,5 +45,6 @@ export default {
   Db: {
     handler: LocalStorageDB,
     seeders: [MixingRoomSeeder, MixerSeeder, JarSeeder, IngredientSeeder],
+    models: [MixingRoom, Mixer, Jar, JarHasIngredient, Mixer, ResultColor],
   },
 };

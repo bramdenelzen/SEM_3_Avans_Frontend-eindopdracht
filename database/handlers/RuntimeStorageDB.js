@@ -1,6 +1,7 @@
 import DatabaseInterface from "./DatabaseInterface.js";
 
 export default class RuntimeStorageDB extends DatabaseInterface {
+
   constructor() {
     super();
     this.db = new Map(); // Map<modelName, Map<id, record>>
@@ -52,6 +53,15 @@ export default class RuntimeStorageDB extends DatabaseInterface {
       throw new Error(`Record with id ${id} not found`);
     }
     store.delete(id);
+    return true;
+  }
+
+  async reset(modelName) {
+    if (!this.db.has(modelName)) {
+      return true;
+    }
+    this._getModelStore(modelName).clear()
+    this.idCounter = 1;
     return true;
   }
 }

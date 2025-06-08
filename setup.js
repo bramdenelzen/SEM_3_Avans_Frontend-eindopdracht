@@ -8,7 +8,6 @@ import { ENV } from "./env.js";
 
 await Weather.configure(ENV.WEATHER_API_KEY);
 
-const db = new config.Db.handler();
 const gui = new Gui(config.Gui);
 
 
@@ -19,10 +18,10 @@ while (!gui.loaded) {
 }
 
 
-BaseModel.configureDatabase(db);
+BaseModel.configureDatabase(config.Db.handler);
 
 const seeder = new Seed(config.Db.seeders);
 
-await seeder.run();
+await seeder.run(config.Db.handler);
 
 new Router(config.Router);

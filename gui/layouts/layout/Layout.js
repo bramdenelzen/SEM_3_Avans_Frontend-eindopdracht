@@ -12,12 +12,11 @@ export default class Layout extends WebComponent {
   async _initializeLayout() {
     Weather.location.subscribe(this._updateLocation.bind(this));
     Weather.currentWeather.subscribe(this._updateWeather.bind(this));
+    MixingRoom.subscribeToModel(this._updateMixingRooms.bind(this));
 
     this._updateLocation();
     this._updateWeather();
-    const mixingRooms = await MixingRoom.find({});
-
-    const nav = this.shadowRoot.querySelector("nav");
+    this._updateMixingRooms();
 
     const currentPath = new Router().getCurrentPath();
     if (currentPath === "/") {
@@ -27,15 +26,32 @@ export default class Layout extends WebComponent {
         .getElementById("colortesting-link")
         .classList.add("active");
     }
+  }
+
+  async _updateMixingRooms() {
+    const mixingRooms = await MixingRoom.find({});
+    const nav = this.shadowRoot.querySelector("nav");
+    const currentPath = new Router().getCurrentPath();
+
+    for (const child of nav.children) {
+      if (child.id.startsWith("mixingroom-")) {
+        child.remove();
+      }
+    }
 
     for (const mixingRoom of mixingRooms) {
       if (this.shadowRoot.getElementById(mixingRoom.id)) {
         continue;
       }
+
+      if (this.shadowRoot.getElementById("mixingroom-" + mixingRoom.id)) {
+        continue; // Skip if the link already exists
+      }
+      
       const mixingRoomLink = document.createElement("a");
       mixingRoomLink.href = `#/mixingroom/${mixingRoom.id}`;
       mixingRoomLink.innerText = mixingRoom.displayName;
-      mixingRoomLink.id = mixingRoom.id;
+      mixingRoomLink.id = "mixingroom-" + mixingRoom.id;
 
       if ("/mixingroom/" + mixingRoom.id === currentPath) {
         mixingRoomLink.classList.add("active");

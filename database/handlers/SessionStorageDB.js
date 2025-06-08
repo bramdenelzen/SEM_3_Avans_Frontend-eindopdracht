@@ -52,5 +52,9 @@ export default class SessionStorageDB extends DatabaseInterface {
     collection = collection.filter(item => item.id !== id);
     this._setCollection(modelName, collection);
     return collection.length < initialLength;
+  } 
+
+  async reset(modelName) {
+    this.storage.removeItem(modelName);
   }
 }
