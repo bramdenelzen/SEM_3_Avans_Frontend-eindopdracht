@@ -33,12 +33,12 @@ export default class Mixer extends WebComponent {
   connectedCallback() {
     this.shadowRoot.addEventListener("dragover", this.#dragoverHandler);
     this.shadowRoot.addEventListener("drop", this.#dropHandler);
-    this.shadowRoot.querySelector("#mixingSpeed").textContent =
-      this.#mixer.mixingSpeed + " RPM";
 
     if (!this.#mixer) {
       throw new Error("Mixer not set");
     }
+    this.shadowRoot.querySelector("#mixingSpeed").textContent =
+      this.#mixer.mixingSpeed + " RPM";
   }
 
   disconnectedCallback() {

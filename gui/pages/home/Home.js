@@ -25,7 +25,7 @@ export default class Home extends WebComponent {
       const db = config.Db.handler;
 
       config.Db.models.forEach(async (model) => {
-        await db.reset(model.modelName);
+        await model.reset()
       });
 
       const seed = new Seed(config.Db.seeders);

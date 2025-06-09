@@ -173,4 +173,15 @@ export default class BaseModel {
       }
     }
   }
+
+  static async reset() {
+    if (!this.db) {
+      throw new Error("Database not configured.");
+    }
+    await this.db.reset(this.modelName);
+
+    this.modelSubscribers.forEach((callback) => {
+      callback({}, "reset");
+    });
+  }
 }
