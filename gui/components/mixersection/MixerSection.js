@@ -87,10 +87,10 @@ export default class MixerSection extends WebComponent {
     const warningElement = this.shadowRoot.getElementById("warning");
 
     console.log(
-      "mixers",
-      mixers.length,
+      "Weather.maxMixingMachines",
       Weather.weatherEffects.state.maxMixingMachines
     );
+
     if (Weather.weatherEffects.state.maxMixingMachines >= mixers.length) {
       warningElement.style.display = "none";
       warningElement.textContent = "";

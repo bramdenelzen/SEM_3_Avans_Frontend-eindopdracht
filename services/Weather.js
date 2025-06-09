@@ -73,10 +73,11 @@ export default class Weather {
 - [ ] Als de temperatuur onder de 10 graden ligt, wordt de mengtijd met 15% verhoogd.
      */
 
-    let mixingTimeMultiplier = Weather.weatherEffects.state.mixingTimeMultiplier
-    let maxMixingMachines = Weather.weatherEffects.state.maxMixingMachines;
+    let mixingTimeMultiplier = 1
+    let maxMixingMachines = 5
 
     const weather = Weather.currentWeather.state;
+
     if (!weather) {
       Weather.weatherEffects.setState({
         mixingTimeMultiplier,
