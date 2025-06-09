@@ -8,20 +8,11 @@ import { ENV } from "./env.js";
 
 await Weather.configure(ENV.WEATHER_API_KEY);
 
-const gui = new Gui(config.Gui);
-
-
-while (!gui.loaded) {
-  await new Promise((resolve) => {
-    setTimeout(resolve, 100);
-  });
-}
-
-
-BaseModel.configureDatabase(config.Db.handler);
+await BaseModel.configureDatabase(config.Db.handler);
 
 const seeder = new Seed(config.Db.seeders);
-
 await seeder.run(config.Db.handler);
+
+await Gui.configure(config.Gui);
 
 new Router(config.Router);

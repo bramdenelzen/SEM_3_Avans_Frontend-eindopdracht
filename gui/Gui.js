@@ -3,26 +3,17 @@ import WebComponent from "./Webcomponent.js";
 export default class Gui {
   static Instance = null;
 
-  registeredGuiFiles = null;
+  static registeredGuiFiles = null;
 
-  loaded = false;
+  static #loaded = false;
 
-  /**
-   * @param {
-   * {
-   * components: string[],
-   * pages: string[],
-   * layouts: string[]
-   * }
-   * } components
-   */
-  constructor(config) {
-    if (Gui.Instance) {
-      return Gui.Instance;
-    } else {
-      Gui.Instance = this;
-    }
+  constructor() {
+    throw new Error(
+      "Gui is a static class and cannot be instantiated. Use Gui.configure(config) instead."
+    );
+  }
 
+  static async configure(config) {
     this.registeredGuiFiles = config.registeredGuiFiles;
 
     if (this.registeredGuiFiles === null) {
@@ -31,34 +22,31 @@ export default class Gui {
       );
     }
 
-    this.getGlobalStylesheet().then(async () => {
-      await this._defineWebComponents(
-        "/gui/components/",
-        this.registeredGuiFiles.components
-      );
-      await this._defineWebComponents(
-        "/gui/pages/",
-        this.registeredGuiFiles.pages
-      );
-      await this._defineWebComponents(
-        "/gui/layouts/",
-        this.registeredGuiFiles.layouts
-      );
+    await this.getGlobalStylesheet();
 
-      this.loaded = true;
-      console.log(this.loaded);
-    });
+    await this._defineWebComponents(
+      "/gui/components/",
+      this.registeredGuiFiles.components
+    );
+    await this._defineWebComponents(
+      "/gui/pages/",
+      this.registeredGuiFiles.pages
+    );
+    await this._defineWebComponents(
+      "/gui/layouts/",
+      this.registeredGuiFiles.layouts
+    );
+
+    return true;
   }
-
   /**
    * @param {string[]} webComponents - Array of paths to components
    * @private
    * @description This method is used to define components in the app.
    */
-  async _defineWebComponents(basePath, webComponents) {
-    console.log("loaded: ", basePath, this.loaded);
+  static async _defineWebComponents(basePath, webComponents) {
     if (Array.isArray(webComponents)) {
-      webComponents.forEach(async (componentName) => {
+      for (const componentName of webComponents) {
         try {
           const componentPath =
             basePath + componentName.toLocaleLowerCase() + "/" + componentName;
@@ -100,11 +88,11 @@ export default class Gui {
         } catch (error) {
           console.error(error);
         }
-      });
+      }
     }
   }
 
-  async getGlobalStylesheet() {
+  static async getGlobalStylesheet() {
     if (!WebComponent.globalStylesheet) {
       const globalStylesheet = await fetch("global.css").then(
         async (response) => {
@@ -121,6 +109,7 @@ export default class Gui {
       );
 
       WebComponent.globalStylesheet = globalStylesheet;
+      return globalStylesheet;
     }
   }
 }

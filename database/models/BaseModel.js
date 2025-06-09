@@ -6,7 +6,7 @@ export default class BaseModel {
   /**
    * @param {DatabaseInterface} databaseInstance
    */
-  static configureDatabase(databaseInstance) {
+  static async configureDatabase(databaseInstance) {
     this.db = databaseInstance;
   }
 
