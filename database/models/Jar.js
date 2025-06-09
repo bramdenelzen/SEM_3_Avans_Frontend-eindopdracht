@@ -1,7 +1,7 @@
 import BaseModel from "./BaseModel.js";
 
 export default class Jar extends BaseModel {
-  static modelName = "jar";
+  static modelName = "jaasdsr";
 
   static schema = {
     name: {

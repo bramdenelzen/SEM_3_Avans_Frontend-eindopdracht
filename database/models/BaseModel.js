@@ -180,6 +180,7 @@ export default class BaseModel {
     }
     await this.db.reset(this.modelName);
 
+    if (!this.modelSubscribers) return;
     this.modelSubscribers.forEach((callback) => {
       callback({}, "reset");
     });

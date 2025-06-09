@@ -72,7 +72,6 @@ export default class Layout extends WebComponent {
     const weather = Weather.currentWeather.state;
 
     if (weather) {
-      console.log("weather", weather);
       const weatherElement = this.shadowRoot.getElementById("weather");
       weatherElement.innerText = `${weather.temp_c}°C, ${weather.condition.text}`;
 

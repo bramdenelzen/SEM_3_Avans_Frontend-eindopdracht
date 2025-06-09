@@ -15,7 +15,6 @@ export default class Weather {
     try {
       const location = await new Promise((resolve, reject) => {
         navigator.geolocation.getCurrentPosition((position) => {
-          console.log("Geolocation position:", position);
           if (!position || !position.coords) {
             reject(new Error("Geolocation position is not available"));
             return;

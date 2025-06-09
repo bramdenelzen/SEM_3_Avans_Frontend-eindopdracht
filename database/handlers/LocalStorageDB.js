@@ -57,6 +57,11 @@ export default class LocalStorageDB extends DatabaseInterface {
 
   static async reset(modelName) {
     LocalStorageDB.storage.removeItem(modelName);
+
+    if (LocalStorageDB.storage.getItem(modelName) !== null) {
+      console.error(`Failed to reset model: ${modelName}`);
+      throw new Error(`Failed to reset model: ${modelName}`);
+    }
     
     return true;
   }

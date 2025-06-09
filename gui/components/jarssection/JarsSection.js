@@ -12,7 +12,6 @@ export default class JarsSection extends WebComponent {
     this.jarListElement = this.shadowRoot.getElementById("jar-list");
 
     this.seedList();
-    console.log("seeded again")
 
     const addButton = this.shadowRoot.getElementById("add-jar");
 
@@ -39,7 +38,7 @@ export default class JarsSection extends WebComponent {
     for (const jar of jars) {
       
       const isMixing = await Mixer.find({ jarId: jar.id });
-      console.log("isMixing", isMixing)
+
       if (isMixing.length > 0) {
         continue; 
       }

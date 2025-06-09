@@ -125,8 +125,6 @@ export default class Mixer extends WebComponent {
         this.shadowRoot.getElementById("progress-bar-fill");
       let start = Date.now();
 
-      console.log(duration);
-
       this.style.animation = `mixing-speed ${duration / 1000}s linear infinite`;
 
       await new Promise((resolve) => {

@@ -11,18 +11,15 @@ export default class MixerSection extends WebComponent {
     this.formbutton = this.shadowRoot.getElementById("add-mixer-button");
     this.mixerListElement = this.shadowRoot.getElementById("mixer-list");
     this._initializemixerList();
-    console.log("MixerSection initialized");
     Weather.weatherEffects.subscribe(this._updateWarning.bind(this));
   }
   static cacheInstances = [];
 
   #formSubmitHandler = function (event) {
     const mixer = event.detail.data;
-    console.log("mixer", mixer);
     this._addMixer(mixer);
 
     this.form.hidePopover();
-    console.log(this.form);
   }.bind(this);
 
   static getCachedInstance() {
@@ -85,11 +82,6 @@ export default class MixerSection extends WebComponent {
     const { mixingroomId } = new Router().getParams();
     const mixers = await Mixer.find({ mixingroomId: Number(mixingroomId) });
     const warningElement = this.shadowRoot.getElementById("warning");
-
-    console.log(
-      "Weather.maxMixingMachines",
-      Weather.weatherEffects.state.maxMixingMachines
-    );
 
     if (Weather.weatherEffects.state.maxMixingMachines >= mixers.length) {
       warningElement.style.display = "none";

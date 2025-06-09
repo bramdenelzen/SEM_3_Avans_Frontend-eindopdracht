@@ -22,11 +22,13 @@ export default class Home extends WebComponent {
 
   async resetApp() {
     try {
-      const db = config.Db.handler;
-
-      config.Db.models.forEach(async (model) => {
-        await model.reset()
-      });
+      try {
+        config.Db.models.forEach(async (model) => {
+          await model.reset();
+        });
+      } catch (error) {
+        console.error("Error resetting models:", error);
+      }
 
       const seed = new Seed(config.Db.seeders);
       await seed.run();

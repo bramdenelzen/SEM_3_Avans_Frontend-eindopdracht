@@ -1,7 +1,7 @@
 import BaseModel from "./BaseModel.js";
 
 export default class Ingredient extends BaseModel {
-  static modelName = "ingredients";
+  static modelName = "ingredient";
 
   static schema = {
     minMixingTime: {

@@ -6,11 +6,22 @@ export default class WeatherForm extends WebComponent {
     super();
   }
 
+  formSubmitHandlerBind = this._formSubmitHandler.bind(this);
+
   connectedCallback() {
-    console.log("WeatherForm connected");
     this.shadowRoot.getElementById("weather-form").addEventListener(
       "submit",
-      async function (e) {
+      this.formSubmitHandlerBind
+    );
+  }
+  disconnectedCallback() {
+    this.shadowRoot.getElementById("weather-form").removeEventListener(
+      "submit",
+      this.formSubmitHandlerBind
+    );
+  }
+
+  async  _formSubmitHandler (e) {
         e.preventDefault();
         const formData = new FormData(e.target);
         try {
@@ -23,7 +34,5 @@ export default class WeatherForm extends WebComponent {
         }
         this.shadowRoot.getElementById("weather-form").reset();
         this.hidePopover();
-      }.bind(this)
-    );
-  }
+      }
 }

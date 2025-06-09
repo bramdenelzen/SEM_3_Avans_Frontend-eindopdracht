@@ -12,8 +12,6 @@ export default class ColorTestingCell extends WebComponent{
 
         const colorFields = this.shadowRoot.querySelectorAll(".color");
 
-        console.log(colorFields)
-
         colorFields.forEach((field, i) => {
             field.style.backgroundColor = new Color(color).TriadicColors[i] ?? "N/A";
         }); 

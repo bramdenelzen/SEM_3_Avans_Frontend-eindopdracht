@@ -129,7 +129,6 @@ export default class Jar extends WebComponent {
   updateSpecs() {
     const mixingSpeed = this.shadowRoot.getElementById("mixing-speed");
     const minMixingTime = this.shadowRoot.getElementById("min-mixing-time");
-    console.log("Updating specs for jar:", Weather.weatherEffects.state);
 
     if (this.#ingredients.length === 0) {
       return
