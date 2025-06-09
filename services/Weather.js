@@ -5,27 +5,37 @@ export default class Weather {
   static location = new State("locaton", null);
   static weatherEffects = new State("weatherEffects", {
     mixingTimeMultiplier: 1,
-    maxMixingMachines: 5,});
+    maxMixingMachines: 5,
+  });
 
   static async configure(apiKey) {
     Weather.apiKey = apiKey;
 
     // Wrap geolocation in a Promise
-    const location = await new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition((position) => {
-        console.log("Geolocation position:", position);
-        resolve({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
+    try {
+      const location = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition((position) => {
+          console.log("Geolocation position:", position);
+          if (!position || !position.coords) {
+            reject(new Error("Geolocation position is not available"));
+            return;
+          }
+          resolve({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },(error)=>{
+          reject(error);
         });
       });
-      resolve(null);
-    });
 
-    if (location) {
-      await Weather.updateCurrentWeather(location);
+      if (location) {
+        await Weather.updateCurrentWeather(location);
+      }
+      return true
+    } catch (error) {
+      return true;
     }
-    return true;
   }
 
   static async updateCurrentWeather(location) {
@@ -73,8 +83,8 @@ export default class Weather {
 - [ ] Als de temperatuur onder de 10 graden ligt, wordt de mengtijd met 15% verhoogd.
      */
 
-    let mixingTimeMultiplier = 1
-    let maxMixingMachines = 5
+    let mixingTimeMultiplier = 1;
+    let maxMixingMachines = 5;
 
     const weather = Weather.currentWeather.state;
 

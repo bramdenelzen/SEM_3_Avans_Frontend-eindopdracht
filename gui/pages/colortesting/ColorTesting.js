@@ -6,8 +6,11 @@ import Color from "../../../services/Color.js";
 import { Notification } from "../../../services/Notifications.js";
 
 export default class ColorTesting extends WebComponent {
+
+
   constructor() {
     super();
+
     this.selectedColor = new State("selectedColor", null);
 
     const columns = 6;
@@ -67,28 +70,18 @@ export default class ColorTesting extends WebComponent {
   }
 
   async _initializeResults() {
-    const list = this.shadowRoot.getElementById("results-list");
-    const results = await ResultColor.find({});
-
-    list.innerHTML = ""; // Clear existing content
-    if (!results || results.length === 0) {
-      const noResultsItem = document.createElement("li");
-      noResultsItem.textContent = "No results found.";
-      list.appendChild(noResultsItem);
-      return;
+    const endresultsElement = this.shadowRoot.querySelector("x-endresults");
+    if (endresultsElement) {
+      endresultsElement.selectedColorState.subscribe((event)=>{
+        const selectedColor = event.detail;
+        if (selectedColor) {
+          this.selectedColor.setState(selectedColor);
+        } else {
+          this.selectedColor.setState(null);
+        }
+      })
+    } else {
+      console.error("EndResults component not found in the shadow DOM.");
     }
-
-    results.forEach((result) => {
-      const listItem = document.createElement("li");
-      listItem.textContent = `Color: ${result.colorHexcode}`;
-      listItem.style.backgroundColor = result.colorHexcode;
-      listItem.classList.add("result-item");
-
-      listItem.addEventListener("click", () => {
-        this.selectedColor.setState(result.colorHexcode);
-        console.log("Selected Color:", result.colorHexcode);
-      });
-      list.appendChild(listItem);
-    });
   }
 }

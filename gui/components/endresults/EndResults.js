@@ -1,13 +1,19 @@
 import ResultColor from "../../../database/models/ResultColor.js";
+import State from "../../../services/State.js";
 import WebComponent from "../../Webcomponent.js";
+import ColorTesting from "../../pages/colortesting/ColorTesting.js";
 
 export default class EndResults extends WebComponent {
+  
+
   constructor() {
     super();
     this.renderList();
+    this.selectedColorState = new State("selectedColor", null);
 
     ResultColor.subscribeToModel(this.renderList.bind(this));
   }
+
   async renderList() {
     const resultsList = this.shadowRoot.getElementById("results-list");
     resultsList.innerHTML = ""; // Clear existing content
@@ -21,23 +27,25 @@ export default class EndResults extends WebComponent {
       return;
     }
 
-    results.forEach((result) => {
+    results.reverse().forEach((result) => {
       const listItem = document.createElement("li");
-      listItem.textContent = `Color: ${result.colorHexcode}`;
-      listItem.style.backgroundColor = result.colorHexcode;
+      listItem.classList.add("result-item");
+
+      const colorText = document.createElement("p");
+      colorText.textContent = result.colorHexcode;
+      listItem.appendChild(colorText);
+
+      const innerColor = document.createElement("div");
+      innerColor.classList.add("inner-color");
+      innerColor.style.backgroundColor = result.colorHexcode;
+      listItem.appendChild(innerColor);
+
       resultsList.appendChild(listItem);
 
       listItem.draggable = true;
 
-      listItem.addEventListener("dragstart", (event) => {
-        event.dataTransfer.setData(
-          "text/plain",
-          JSON.stringify({
-            color: {
-              hexCode: result.colorHexcode,
-            },
-          })
-        );
+      listItem.addEventListener("click", (event) => {
+        this.selectedColorState.setState(result.colorHexcode);
       });
     });
   }
