@@ -8,6 +8,7 @@ import JarSeeder from "./database/seeders/JarSeeder.js";
 import MixerSeeder from "./database/seeders/MixerSeeder.js";
 import MixingRoomSeeder from "./database/seeders/MixingRoomSeeder.js";
 import ResultColor from "./database/models/ResultColor.js";
+import Ingredient from "./database/models/Ingredient.js";
 
 export default {
   Router: {
@@ -42,6 +43,6 @@ export default {
   Db: {
     handler: LocalStorageDB,
     seeders: [MixingRoomSeeder, MixerSeeder, JarSeeder, IngredientSeeder],
-    models: [MixingRoom, Mixer, Jar, JarHasIngredient, Mixer, ResultColor],
+    models: [MixingRoom, Mixer, Jar, JarHasIngredient, Mixer, ResultColor, Ingredient],
   },
 };

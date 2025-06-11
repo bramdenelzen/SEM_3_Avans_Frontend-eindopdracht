@@ -24,15 +24,31 @@
   display: block;
 }
 
+.cell:hover.empty > .popup {
+  display: none;
+
+}
+
 .popup {
   display: none;
-  background-color: red;
+  padding: 2rem 1rem;
+  background-color: var(--base-0);
+  border: 1px solid var(--base-200);
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-md);
   position: absolute;
   z-index: 10;
-  bottom: 0;
+  top: 80px;
   left: 0;
-  height: 30px;
-  width: 100%;
+}
+.empty{
+  appearance: none;
+}
+
+.popup-content{
+  display: flex;
+  gap:  10px;
+  height: 150px;
 }
 
 .color {

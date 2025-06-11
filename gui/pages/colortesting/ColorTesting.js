@@ -6,8 +6,6 @@ import Color from "../../../services/Color.js";
 import { Notification } from "../../../services/Notifications.js";
 
 export default class ColorTesting extends WebComponent {
-
-
   constructor() {
     super();
 
@@ -29,15 +27,10 @@ export default class ColorTesting extends WebComponent {
 
     if (palette) {
       palette.style.backgroundColor = newColor.hexCode ?? "transparent";
-    
-    }
-
-    const selectedColorElement =
-      this.shadowRoot.getElementById("selected-color");
-
-    if (selectedColorElement) {
-      selectedColorElement.style.backgroundColor = newColor ?? "transparent";
-      selectedColorElement.textContent = newColor.hexCode ?? "Select a color";
+      palette.style.color = newColor.hsl.l > 50 ? "black" : "white";
+      palette.innerHTML = `hsl(${newColor.hsl.h}, ${newColor.hsl.s}%, ${newColor.hsl.l}%) <br>
+rgb(${newColor.rgb.r}, ${newColor.rgb.g}, ${newColor.rgb.b}) <br>
+hex: ${newColor.hexCode}`;
     }
   }
 
@@ -49,18 +42,17 @@ export default class ColorTesting extends WebComponent {
       gridRow.classList.add("grid-row");
       for (let column = 0; column < columns; column++) {
         const cell = document.createElement("x-colortestingcell");
-        cell.addEventListener("click", function(event){
-          const currentColor = this.selectedColor.state;
-          if (!currentColor) {
-            new Notification(
-              "Please select a color from the palette first.","error"
-              
-            );
-            return;
-          }
-          cell.color = currentColor;
-          this.selectedColor.setState(null)
-        }.bind(this));
+        cell.addEventListener(
+          "click",
+          function (event) {
+            const currentColor = this.selectedColor.state;
+            if (!currentColor) {
+              return;
+            }
+            cell.color = currentColor;
+            this.selectedColor.setState(null);
+          }.bind(this)
+        );
         cell.setAttribute("row", row);
         cell.setAttribute("column", column);
         gridRow.appendChild(cell);
@@ -72,14 +64,14 @@ export default class ColorTesting extends WebComponent {
   async _initializeResults() {
     const endresultsElement = this.shadowRoot.querySelector("x-endresults");
     if (endresultsElement) {
-      endresultsElement.selectedColorState.subscribe((event)=>{
+      endresultsElement.selectedColorState.subscribe((event) => {
         const selectedColor = event.detail;
         if (selectedColor) {
           this.selectedColor.setState(selectedColor);
         } else {
           this.selectedColor.setState(null);
         }
-      })
+      });
     } else {
       console.error("EndResults component not found in the shadow DOM.");
     }

@@ -28,8 +28,13 @@
     }
 }
 
+.palette{
+  margin-top:2rem
+}
+
 #color-palette {
-  height: 50px;
+  min-height: 50px;
+  padding: 2rem;
   width: 100%;
   border: 1px solid var(--base-100);
   border-radius: var(--radius-md);
@@ -38,9 +43,6 @@
   justify-content: center;
 }
 
-x-endresults {
-  overflow: scroll;
-}
 
 
 section {
