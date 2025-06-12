@@ -11,6 +11,8 @@ export default class Page extends WebComponent{
       return this._cachedInstance.get(path);
     }
 
+    console.log("new page generated")
+
     const instance = document.createElement(`x-${this.name.toLowerCase()}`);
 
     this._cachedInstance.set(path, instance);
