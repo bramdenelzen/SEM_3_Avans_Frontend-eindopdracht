@@ -1,3 +1,6 @@
+import Error from "../gui/pages/error/Error.js";
+import Page from "../gui/pages/Page.js";
+
 export default class Router {
   static router = null;
 
@@ -20,7 +23,7 @@ export default class Router {
     return location.hash.slice(1) || "/";
   }
 
-  matchRoute(path) {
+  _matchRoute(path) {
     for (const [routePath, routeContent] of Object.entries(this.routes)) {
       const paramNames = [];
       const regexPattern = routePath.replace(/{([^}]+)}/g, (_, name) => {
@@ -42,28 +45,28 @@ export default class Router {
     return null;
   }
 
-  route() {
+  async route() {
     const path = this.getCurrentPath();
-    const match = this.matchRoute(path);
+    const match = this._matchRoute(path);
+
 
     if (match) {
       this.currentParams = match.params; // <-- Update current params
+      const routeContent = match.routeContent;
 
-      const html = match.routeContent;
-
-      if (typeof html === "function") {
+      if (typeof routeContent === "function") {
         this.appElement.innerHTML = ""; // Clear previous content
-        this.appElement.appendChild(html);
-      }else if (typeof html === "string") {
-        this.appElement.innerHTML = html;
-      } else if (html instanceof HTMLElement) {
+        this.appElement.appendChild(await routeContent.getPage());
+      }else if (typeof routeContent === "string") {
+        this.appElement.innerHTML = routeContent;
+      } else if (routeContent instanceof Page) {
         this.appElement.innerHTML = ""; // Clear previous content
-        this.appElement.appendChild(html);
+        this.appElement.appendChild(routeContent);
       } else {
-        console.error("Invalid route content:", html);
+        console.error("Invalid route content:", routeContent);
       }
     } else {
-      this.appElement.innerHTML = `<x-error status="404" message="Not found"></x-error>`;
+      this.appElement.innerHTML = "<x-error status='404' message='Not found'></x-error>";
     }
   }
 

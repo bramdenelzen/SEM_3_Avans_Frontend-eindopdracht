@@ -8,14 +8,40 @@ import { Notification } from "../../../services/Notifications.js";
 export default class IngredientsSection extends WebComponent {
   constructor() {
     super();
+
+    this.ingredientListElement =
+      this.shadowRoot.getElementById("ingredient-list");
+
+    this._seedList();
+    IngredientModel.subscribeToModel(this._seedList.bind(this));
+    this._updateDisableFormButton();
   }
 
-  async connectedCallback() {
-    const addButton = this.shadowRoot.getElementById("add-ingredient");
+  disconnectedCallback() {
+    const form = this.shadowRoot.querySelector("x-ingredientsform");
+    form.removeEventListener("submitSucces", this.submitHandler);
+  }
 
+  async _seedList() {
+    this.ingredientListElement.innerHTML = "";
+    const ingredients = await Ingredient.find({});
+
+    for (const ingredient of ingredients) {
+      console.log(ingredients);
+      const ingredientListItemElement = document.createElement(
+        "x-ingredientlistitem"
+      );
+
+      ingredientListItemElement.ingredient = ingredient;
+
+      this.ingredientListElement.prepend(ingredientListItemElement);
+    }
+  }
+
+  async _updateDisableFormButton() {
     const { mixingroomId } = new Router().getParams();
-
     const mixingroom = await MixingRoom.find({});
+    const addButton = this.shadowRoot.getElementById("add-ingredient");
 
     if (mixingroom[0].id != Number(mixingroomId)) {
       addButton.removeAttribute("popovertarget");
@@ -25,49 +51,6 @@ export default class IngredientsSection extends WebComponent {
           "error"
         );
       });
-    }
-
-    this.ingredientListElement =
-      this.shadowRoot.getElementById("ingredient-list");
-
-    this.form = this.shadowRoot.querySelector("x-ingredientsform");
-
-    this.seedList();
-    
-    IngredientModel.subscribeToModel(
-      async function (data, type) {
-        if (type !== "create") {
-          const ingredient = await IngredientModel.findById(data.id); // Use the data argument directly
-
-          const ingredientListItemElement = document.createElement(
-            "x-ingredientlistitem"
-          );
-          ingredientListItemElement.ingredient = ingredient;
-
-          this.ingredientListElement.prepend(ingredientListItemElement);
-          return;
-        }
-        this.seedList()
-      }.bind(this)
-    );
-  }
-
-  disconnectedCallback() {
-    this.form.removeEventListener("submitSucces", this.submitHandler);
-  }
-
-  async seedList() {
-    this.ingredientListElement.innerHTML = "";
-    const ingredients = await Ingredient.find({});
-
-    for (const ingredient of ingredients) {
-      const ingredientListItemElement = document.createElement(
-        "x-ingredientlistitem"
-      );
-
-      ingredientListItemElement.ingredient = ingredient;
-
-      this.ingredientListElement.prepend(ingredientListItemElement);
     }
   }
 }

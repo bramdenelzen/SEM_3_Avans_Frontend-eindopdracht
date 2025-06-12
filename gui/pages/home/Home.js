@@ -3,7 +3,8 @@ import WebComponent from "../../Webcomponent.js";
 import config from "../../../config.js";
 import Seed from "../../../database/seeders/Seed.js";
 import { Notification } from "../../../services/Notifications.js";
-export default class Home extends WebComponent {
+import Page from "../Page.js";
+export default class Home extends Page {
   constructor() {
     super();
   }

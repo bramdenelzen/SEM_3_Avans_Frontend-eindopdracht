@@ -4,8 +4,9 @@ import WebComponent from "../../Webcomponent.js";
 import ResultColor from "../../../database/models/ResultColor.js";
 import Color from "../../../services/Color.js";
 import { Notification } from "../../../services/Notifications.js";
+import Page from "../Page.js";
 
-export default class ColorTesting extends WebComponent {
+export default class ColorTesting extends Page {
   constructor() {
     super();
 

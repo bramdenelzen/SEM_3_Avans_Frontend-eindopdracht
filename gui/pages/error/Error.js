@@ -1,6 +1,6 @@
-import WebComponent from "../../Webcomponent.js";
+import Page from "../Page.js";
 
-export default class Error extends WebComponent{
+export default class Error extends Page{
     constructor(){
         super()
     }

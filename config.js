@@ -1,6 +1,7 @@
 import LocalStorageDB from "./database/handlers/LocalStorageDB.js";
 import Mixer from "./database/models/Mixer.js";
 import MixingRoom from "./database/models/MixingRoom.js";
+import MixingRoomPage from "./gui/pages/mixingroom/MixingRoom.js";
 import Jar from "./database/models/Jar.js";
 import JarHasIngredient from "./database/models/JarHasIngredient.js";
 import IngredientSeeder from "./database/seeders/IngredientSeeder.js";
@@ -9,13 +10,15 @@ import MixerSeeder from "./database/seeders/MixerSeeder.js";
 import MixingRoomSeeder from "./database/seeders/MixingRoomSeeder.js";
 import ResultColor from "./database/models/ResultColor.js";
 import Ingredient from "./database/models/Ingredient.js";
+import Home from "./gui/pages/home/Home.js";
+import ColorTesting from "./gui/pages/colortesting/ColorTesting.js";
 
 export default {
   Router: {
     routes: {
-      "/": document.createElement("x-home"),
-      "/mixingroom/{mixingroomId}": "<x-mixingroom></x-mixingroom>",
-      "/colortesting": document.createElement("x-colortesting"),
+      "/":Home,
+      "/mixingroom/{mixingroomId}": MixingRoomPage,
+      "/colortesting": ColorTesting,
     },
   },
   Gui: {
@@ -43,6 +46,14 @@ export default {
   Db: {
     handler: LocalStorageDB,
     seeders: [MixingRoomSeeder, MixerSeeder, JarSeeder, IngredientSeeder],
-    models: [MixingRoom, Mixer, Jar, JarHasIngredient, Mixer, ResultColor, Ingredient],
+    models: [
+      MixingRoom,
+      Mixer,
+      Jar,
+      JarHasIngredient,
+      Mixer,
+      ResultColor,
+      Ingredient,
+    ],
   },
 };

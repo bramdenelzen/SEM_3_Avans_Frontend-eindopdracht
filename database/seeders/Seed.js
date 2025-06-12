@@ -2,7 +2,7 @@ import BaseSeeder from "./BaseSeeder.js";
 
 export default class Seed {
   constructor(seeders = []) {
-    this.seeders = seeders;
+    this._seeders = seeders;
   }
 
   addSeeder(seeder) {
@@ -10,11 +10,11 @@ export default class Seed {
       throw new Error("Seeder must be an instance of BaseSeeder");
     }
 
-    this.seeders.push(seeder);
+    this._seeders.push(seeder);
   }
 
   async run() {
-    for (const seeder of this.seeders) {
+    for (const seeder of this._seeders) {
       await seeder.run();
     }
   }
