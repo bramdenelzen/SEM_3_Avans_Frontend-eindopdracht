@@ -18,20 +18,20 @@ export default class Mixer extends BaseModel {
   };
 
   /**
-   * @param {number} minMixingTimeOrData
-   * @param {number} minMixingSpeed
-   * @param {string} colorCode
-   * @param {string} texture
+   * @param {number|object} mixingSpeedOrData
+   * @param {number} mixingroomId
+   * @param {number} jarId
    */
-  constructor(mixingSpeedOrData, mixingroomId) {
-    // Support both `new User({ id, name, age })` and `new User(name, age)`
+  constructor(mixingSpeedOrData,  mixingroomId, jarId) {
     let data;
+
     if (typeof mixingSpeedOrData === "object") {
       data = mixingSpeedOrData;
     } else {
       data = {
         mixingSpeed: mixingSpeedOrData,
-        mixingroomId: mixingroomId,
+        mixingroomId,
+        jarId
       };
     }
 

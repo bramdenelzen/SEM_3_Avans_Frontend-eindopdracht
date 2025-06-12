@@ -15,15 +15,12 @@ export default class Jar extends BaseModel {
   };
 
   /**
-   *
-   * @param {number} minMixingTimeOrData
-   * @param {number} minMixingSpeed
-   * @param {string} colorCode
-   * @param {string} texture
+   * @param {number|object} jarIdOrData
+   * @param {number|object} ingredientId
    */
-  constructor(jarIdOrData) {
-    // Support both `new User({ id, name, age })` and `new User(name, age)`
+  constructor(jarIdOrData, ingredientId) {
     let data;
+
     if (typeof jarIdOrData === "object") {
       data = jarIdOrData;
     } else {

@@ -23,15 +23,14 @@ export default class Ingredient extends BaseModel {
   };
 
   /**
-   *
    * @param {number} minMixingTimeOrData
    * @param {number} minMixingSpeed
    * @param {string} colorCode
    * @param {string} texture
    */
   constructor(minMixingTimeOrData, minMixingSpeed, colorHexcode, texture) {
-    // Support both `new User({ id, name, age })` and `new User(name, age)`
     let data;
+
     if (typeof minMixingTimeOrData === "object") {
       data = minMixingTimeOrData;
     } else {

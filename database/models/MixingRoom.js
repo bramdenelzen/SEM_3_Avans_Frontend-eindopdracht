@@ -15,20 +15,18 @@ export default class MixingRoom extends BaseModel {
   };
 
   /**
-   *
-   * @param {number} minMixingTimeOrData
-   * @param {number} minMixingSpeed
-   * @param {string} colorCode
-   * @param {string} texture
+   * @param {string|object}colorOrData
+   * @param {string}displayName
    */
-  constructor(colorOrData) {
-    // Support both `new User({ id, name, age })` and `new User(name, age)`
+  constructor(colorOrData, displayName) {
     let data;
+
     if (typeof colorOrData === "object") {
       data = colorOrData;
     } else {
       data = {
         color: colorOrData,
+        displayName
       };
     }
 

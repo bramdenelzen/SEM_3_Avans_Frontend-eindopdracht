@@ -1,19 +1,19 @@
 import DatabaseInterface from "../handlers/DatabaseInterface.js";
 
 export default class BaseModel {
-  static db = null;
+  static _db;
 
   /**
    * @param {DatabaseInterface} databaseInstance
    */
   static async configureDatabase(databaseInstance) {
-    this.db = databaseInstance;
+    this._db = databaseInstance;
   }
 
   #instanceSubscribers = [];
 
   constructor(modelName, data = {}) {
-    if (!this.constructor.db) {
+    if (!this.constructor._db) {
       throw new Error("Database not configured.");
     }
 
@@ -85,7 +85,7 @@ export default class BaseModel {
       return this.update();
     } else {
       this._validate(this._getData());
-      const saved = await this.constructor.db.create(
+      const saved = await this.constructor._db.create(
         this.modelName,
         this._getData()
       );
@@ -98,7 +98,7 @@ export default class BaseModel {
   async update() {
     if (!this.id) throw new Error("Cannot update unsaved instance.");
     this._validate(this._getData());
-    const updated = await this.constructor.db.update(
+    const updated = await this.constructor._db.update(
       this.modelName,
       this.id,
       this._getData()
@@ -110,7 +110,7 @@ export default class BaseModel {
 
   async delete() {
     if (!this.id) throw new Error("Cannot delete unsaved instance.");
-    await this.constructor.db.delete(this.modelName, this.id);
+    await this.constructor._db.delete(this.modelName, this.id);
     this.notify({}, "delete");
     return true;
   }
@@ -124,12 +124,12 @@ export default class BaseModel {
 
   // Static method to find and return instances
   static async find(query = {}) {
-    const rawRecords = await this.db.read(this.modelName, query);
+    const rawRecords = await this._db.read(this.modelName, query);
     return rawRecords.map((data) => new this(data)); // return class instances
   }
 
   static async findById(id) {
-    const rawRecords = await this.db.read(this.modelName, { id });
+    const rawRecords = await this._db.read(this.modelName, { id });
     if (rawRecords.length === 0) return null;
     return new this(rawRecords[0]); // return class instance
   }
@@ -175,12 +175,10 @@ export default class BaseModel {
   }
 
   static async reset() {
-    if (!this.db) {
+    if (!this._db) {
       throw new Error("Database not configured.");
     }
-    await this.db.reset(this.modelName);
-
-    console.log(`Model ${this.modelName} has been reset.`);
+    await this._db.reset(this.modelName);
 
     if (!this.modelSubscribers) return;
     this.modelSubscribers.forEach((callback) => {

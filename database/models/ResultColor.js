@@ -11,7 +11,7 @@ export default class ResultColor extends BaseModel {
   };
 
   /**
-   * @param {number} colorHexcodeOrData
+   * @param {string|object} colorHexcodeOrData
    */
   constructor(colorHexcodeOrData) {
     let data;
