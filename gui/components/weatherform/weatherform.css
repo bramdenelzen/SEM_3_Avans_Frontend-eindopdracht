@@ -25,7 +25,11 @@ form{
 }
 
 button[type="submit"]{
-  margin-top:20px
+  margin-top:20px;
+  &.loading{
+    opacity: 0.7;
+    cursor: progress;
+  }
 }
 
 .inputfield {

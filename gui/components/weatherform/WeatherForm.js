@@ -26,6 +26,7 @@ export default class WeatherForm extends WebComponent {
         const formData = new FormData(e.target);
         const submitButton = this.shadowRoot.getElementById("submit-button");
         submitButton.disabled = true;
+        submitButton.classList.add("loading")
         try {
           await Weather.updateCurrentWeather(formData.get("city"));
         } catch (error) {
@@ -33,8 +34,12 @@ export default class WeatherForm extends WebComponent {
             "error"
           ).innerText = `** ${error.message} **`;
           return;
+        }finally{
+          submitButton.disabled = false;
+          submitButton.classList.remove("loading")
+
         }
-        submitButton.disabled = false;
+        
         this.shadowRoot.getElementById("weather-form").reset();
         this.hidePopover();
       }
