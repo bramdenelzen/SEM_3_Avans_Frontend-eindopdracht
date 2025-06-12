@@ -4,14 +4,17 @@ export default class BaseModel {
   static _db;
 
   /**
+   * Setting the database on the Basemodel
    * @param {DatabaseInterface} databaseInstance
    */
   static async configureDatabase(databaseInstance) {
     this._db = databaseInstance;
   }
 
-  #instanceSubscribers = [];
-
+  /**
+   * @param {string} modelName 
+   * @param {object} data 
+   */
   constructor(modelName, data = {}) {
     if (!this.constructor._db) {
       throw new Error("Database not configured.");
@@ -22,6 +25,12 @@ export default class BaseModel {
 
     Object.assign(this, data);
   }
+
+  /*
+  Subscribing implementation
+  */
+
+  #instanceSubscribers = [];
 
   static subscribeToModel(callback) {
     if (!this.modelSubscribers) {
@@ -58,12 +67,12 @@ export default class BaseModel {
     }
   }
 
-  notify(data, type) {
-    this.notifyInstanceSubscribers(data, type);
-    this.notifyModelSubscribers(data, type);
+  _notify(data, type) {
+    this._notifyInstanceSubscribers(data, type);
+    this._notifyModelSubscribers(data, type);
   }
 
-  notifyModelSubscribers(data, type) {
+  _notifyModelSubscribers(data, type) {
     if (this.constructor.modelSubscribers) {
       this.constructor.modelSubscribers.forEach((callback) => {
         callback(data, type);
@@ -71,7 +80,7 @@ export default class BaseModel {
     }
   }
 
-  notifyInstanceSubscribers(data, type) {
+  _notifyInstanceSubscribers(data, type) {
     if (this.constructor.instanceSubscribers) {
       const arr = this.constructor.instanceSubscribers[this.id] ?? [];
       arr.forEach((callback) => {
@@ -80,16 +89,20 @@ export default class BaseModel {
     }
   }
 
+  /*
+  Database interactions
+  */
+
   async save() {
     if (this.id) {
       return this.update();
     } else {
-      this._validate(this._getData());
+      this._validateSchema(this._getVisibleData());
       const saved = await this.constructor._db.create(
         this.modelName,
-        this._getData()
+        this._getVisibleData()
       );
-      this.notify(saved, "saved");
+      this._notify(saved, "saved");
       Object.assign(this, saved); // Update instance with ID and any changes
       return this;
     }
@@ -97,13 +110,13 @@ export default class BaseModel {
 
   async update() {
     if (!this.id) throw new Error("Cannot update unsaved instance.");
-    this._validate(this._getData());
+    this._validateSchema(this._getVisibleData());
     const updated = await this.constructor._db.update(
       this.modelName,
       this.id,
-      this._getData()
+      this._getVisibleData()
     );
-    this.notify(updated, "update");
+    this._notify(updated, "update");
     Object.assign(this, updated);
     return this;
   }
@@ -111,35 +124,44 @@ export default class BaseModel {
   async delete() {
     if (!this.id) throw new Error("Cannot delete unsaved instance.");
     await this.constructor._db.delete(this.modelName, this.id);
-    this.notify({}, "delete");
+    this._notify({}, "delete");
     return true;
   }
 
-  // Get plain data object (excluding DB/config fields)
-  _getData() {
-    const data = { ...this };
-    delete data.modelName;
-    return data;
-  }
-
-  // Static method to find and return instances
   static async find(query = {}) {
     const rawRecords = await this._db.read(this.modelName, query);
-    return rawRecords.map((data) => new this(data)); // return class instances
+    return rawRecords.map((data) => new this(data));
   }
 
   static async findById(id) {
     const rawRecords = await this._db.read(this.modelName, { id });
     if (rawRecords.length === 0) return null;
-    return new this(rawRecords[0]); // return class instance
+    return new this(rawRecords[0]);
   }
 
-  _validate(data) {
+  static async reset() {
+    if (!this._db) {
+      throw new Error("Database not configured.");
+    }
+    await this._db.reset(this.modelName);
+
+    if (!this.modelSubscribers) return;
+    this.modelSubscribers.forEach((callback) => {
+      callback({}, "reset");
+    });
+    return;
+  }
+
+  _getVisibleData() {
+    const data = { ...this };
+    delete data.modelName;
+    return data;
+  }
+
+  _validateSchema(schema) {
     for (const key in this.constructor.schema) {
       const schemaField = this.constructor.schema[key];
-      const value = data[key];
-
-      // Required check
+      const value = schema[key];
       if (
         schemaField.required &&
         (value === undefined ||
@@ -151,12 +173,11 @@ export default class BaseModel {
       }
     }
 
-    for (const key in data) {
-      if (key == "id") continue; // Skip ID validation
+    for (const key in schema) {
+      if (key == "id") continue;
       const schemaField = this.constructor.schema[key];
-      const value = data[key];
+      const value = schema[key];
 
-      // Only type check if value is not null or undefined
       if (schemaField) {
         if (value !== undefined && value !== null) {
           if (typeof value !== schemaField.type) {
@@ -172,18 +193,5 @@ export default class BaseModel {
         throw new Error(`Invalid property ${key} for model ${this.modelName}`);
       }
     }
-  }
-
-  static async reset() {
-    if (!this._db) {
-      throw new Error("Database not configured.");
-    }
-    await this._db.reset(this.modelName);
-
-    if (!this.modelSubscribers) return;
-    this.modelSubscribers.forEach((callback) => {
-      callback({}, "reset");
-    });
-    return
   }
 }
