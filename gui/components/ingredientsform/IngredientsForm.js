@@ -3,26 +3,27 @@ import Ingredient from "../../../database/models/Ingredient.js";
 import { Notification } from "../../../services/Notifications.js";
 
 export default class IngredientsForm extends WebComponent {
-
-  #submitHandler
+  #submitHandler;
+  #formElement;
+  #errorElement;
 
   constructor() {
     super();
 
-    this.formElement = this.shadowRoot.querySelector("form");
-    this.errorElement = this.shadowRoot.getElementById("error");
+    this.#formElement = this.shadowRoot.querySelector("form");
+    this.#errorElement = this.shadowRoot.getElementById("error");
     this.setAttribute("popover", "");
-    this.classList.add("popover")
+    this.classList.add("popover");
 
     this.#submitHandler = this.submitHandler.bind(this);
   }
 
   connectedCallback() {
-    this.formElement.addEventListener("submit", this.#submitHandler);
+    this.#formElement.addEventListener("submit", this.#submitHandler);
   }
-  
+
   disconnectedCallback() {
-    this.formElement.removeEventListener("submit", this.#submitHandler);
+    this.#formElement.removeEventListener("submit", this.#submitHandler);
   }
 
   /**
@@ -31,8 +32,10 @@ export default class IngredientsForm extends WebComponent {
    */
   async submitHandler(event) {
     event.preventDefault();
-    this.errorElement.innerText = "";
-    const formData = new FormData(this.formElement);
+
+    this.#errorElement.innerText = "";
+
+    const formData = new FormData(this.#formElement);
 
     try {
       const ingredient = new Ingredient({
@@ -43,15 +46,18 @@ export default class IngredientsForm extends WebComponent {
       });
 
       await ingredient.save();
-      this.hidePopover()
+
+      this.hidePopover();
 
       this.dispatchEvent(
         new CustomEvent("submitSucces", { detail: { data: ingredient } })
       );
-      this.formElement.reset();
+
+      this.#formElement.reset();
+
       new Notification("Ingredient created successfully", "success");
     } catch (error) {
-      this.errorElement.innerText = `** ${error.message} **`;
+      this.#errorElement.innerText = `** ${error.message} **`;
     }
   }
 }

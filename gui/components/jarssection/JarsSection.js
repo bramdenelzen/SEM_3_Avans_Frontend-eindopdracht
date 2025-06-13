@@ -6,10 +6,13 @@ import Mixer from "../../../database/models/Mixer.js";
 export default class JarsSection extends WebComponent {
   constructor() {
     super();
-    this._seedList();
+    this.#seedList();
 
-    const addButton = this.shadowRoot.getElementById("add-jar");
-    addButton.addEventListener("click", async () => {
+    this.shadowRoot.getElementById("add-jar-button").addEventListener("click", this.#addJarEventListener.bind(this));
+  }
+
+  async #addJarEventListener() {
+    try {
       const jar = new Jar({
         name: "new Jar",
       });
@@ -19,11 +22,14 @@ export default class JarsSection extends WebComponent {
       jarElement.jar = jar;
 
       this.shadowRoot.getElementById("jar-list").prepend(jarElement);
+
       new Notification("Jar created successfully", "success");
-    });
+    } catch (error) {
+      new Notification("Could not create jar", "error");
+    }
   }
 
-  async _seedList() {
+  async #seedList() {
     const jarListElement = this.shadowRoot.getElementById("jar-list");
     jarListElement.innerHTML = "";
     const jars = await Jar.find({});

@@ -6,41 +6,40 @@ export default class WeatherForm extends WebComponent {
     super();
   }
 
-  formSubmitHandlerBind = this._formSubmitHandler.bind(this);
+  formSubmitHandlerBind = this.#formSubmitHandler.bind(this);
 
   connectedCallback() {
-    this.shadowRoot.getElementById("weather-form").addEventListener(
-      "submit",
-      this.formSubmitHandlerBind
-    );
+    this.shadowRoot
+      .getElementById("weather-form")
+      .addEventListener("submit", this.formSubmitHandlerBind);
   }
   disconnectedCallback() {
-    this.shadowRoot.getElementById("weather-form").removeEventListener(
-      "submit",
-      this.formSubmitHandlerBind
-    );
+    this.shadowRoot
+      .getElementById("weather-form")
+      .removeEventListener("submit", this.formSubmitHandlerBind);
   }
 
-  async  _formSubmitHandler (e) {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const submitButton = this.shadowRoot.getElementById("submit-button");
-        submitButton.disabled = true;
-        submitButton.classList.add("loading")
-        try {
-          await Weather.updateCurrentWeather(formData.get("city"));
-        } catch (error) {
-          this.shadowRoot.getElementById(
-            "error"
-          ).innerText = `** ${error.message} **`;
-          return;
-        }finally{
-          submitButton.disabled = false;
-          submitButton.classList.remove("loading")
+  async #formSubmitHandler(e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
 
-        }
-        
-        this.shadowRoot.getElementById("weather-form").reset();
-        this.hidePopover();
-      }
+    const submitButton = this.shadowRoot.getElementById("submit-button");
+    submitButton.disabled = true;
+    submitButton.classList.add("loading");
+
+    try {
+      await Weather.updateCurrentWeather(formData.get("city"));
+    } catch (error) {
+      this.shadowRoot.getElementById(
+        "error"
+      ).innerText = `** ${error.message} **`;
+      return;
+    } finally {
+      submitButton.disabled = false;
+      submitButton.classList.remove("loading");
+    }
+
+    this.shadowRoot.getElementById("weather-form").reset();
+    this.hidePopover();
+  }
 }

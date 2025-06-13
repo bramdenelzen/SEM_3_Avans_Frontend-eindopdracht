@@ -6,17 +6,17 @@ import WebComponent from "../../Webcomponent.js";
 export default class Layout extends WebComponent {
   constructor() {
     super();
-    this._initializeLayout();
+    this.#initializeLayout();
   }
 
-  async _initializeLayout() {
-    Weather.location.subscribe(this._updateLocation.bind(this));
-    Weather.currentWeather.subscribe(this._updateWeather.bind(this));
-    MixingRoom.subscribeToModel(this._updateMixingRooms.bind(this));
+  async #initializeLayout() {
+    Weather.location.subscribe(this.#updateLocation.bind(this));
+    Weather.currentWeather.subscribe(this.#updateWeather.bind(this));
+    MixingRoom.subscribeToModel(this.#updateMixingRooms.bind(this));
 
-    this._updateLocation();
-    this._updateWeather();
-    this._updateMixingRooms();
+    this.#updateLocation();
+    this.#updateWeather();
+    this.#updateMixingRooms();
 
     const currentPath = new Router().getCurrentPath();
     if (currentPath === "/") {
@@ -28,7 +28,7 @@ export default class Layout extends WebComponent {
     }
   }
 
-  async _updateMixingRooms() {
+  async #updateMixingRooms() {
     const mixingRooms = await MixingRoom.find({});
     const nav = this.shadowRoot.querySelector("nav");
     const currentPath = new Router().getCurrentPath();
@@ -60,7 +60,7 @@ export default class Layout extends WebComponent {
     }
   }
 
-  _updateLocation() {
+  #updateLocation() {
     const location = Weather.location.state;
     if (location) {
       const locationElement = this.shadowRoot.getElementById("location");
@@ -68,7 +68,7 @@ export default class Layout extends WebComponent {
     }
   }
 
-  _updateWeather() {
+  #updateWeather() {
     const weather = Weather.currentWeather.state;
 
     if (weather) {

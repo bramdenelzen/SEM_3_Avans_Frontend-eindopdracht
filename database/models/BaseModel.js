@@ -12,8 +12,8 @@ export default class BaseModel {
   }
 
   /**
-   * @param {string} modelName 
-   * @param {object} data 
+   * @param {string} modelName
+   * @param {object} data
    */
   constructor(modelName, data = {}) {
     if (!this.constructor._db) {
@@ -74,8 +74,8 @@ export default class BaseModel {
 
   _notifyModelSubscribers(data, type) {
     if (this.constructor.modelSubscribers) {
-      this.constructor.modelSubscribers.forEach((callback) => {
-        callback(data, type);
+      this.constructor.modelSubscribers.forEach(async (callback) => {
+        await callback(data, type);
       });
     }
   }
@@ -83,8 +83,8 @@ export default class BaseModel {
   _notifyInstanceSubscribers(data, type) {
     if (this.constructor.instanceSubscribers) {
       const arr = this.constructor.instanceSubscribers[this.id] ?? [];
-      arr.forEach((callback) => {
-        callback(data, type);
+      arr.forEach(async (callback) => {
+        await callback(data, type);
       });
     }
   }

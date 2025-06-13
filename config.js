@@ -29,7 +29,6 @@ export default {
         "IngredientsForm",
         "IngredientListItem",
         "Jar",
-        "Shelf",
         "Toast",
         "ToastList",
         "JarsSection",

@@ -4,17 +4,18 @@ import WebComponent from "../../Webcomponent.js";
 import ColorTesting from "../../pages/colortesting/ColorTesting.js";
 
 export default class EndResults extends WebComponent {
-  
+
+  selectedColorState;
 
   constructor() {
     super();
-    this.renderList();
+    this.#seedList();
     this.selectedColorState = new State("selectedColor", null);
 
-    ResultColor.subscribeToModel(this.renderList.bind(this));
+    ResultColor.subscribeToModel(this.#seedList.bind(this));
   }
 
-  async renderList() {
+  async #seedList() {
     const resultsList = this.shadowRoot.getElementById("results-list");
     resultsList.innerHTML = ""; // Clear existing content
 
@@ -42,7 +43,6 @@ export default class EndResults extends WebComponent {
 
       resultsList.appendChild(listItem);
 
-      listItem.draggable = true;
 
       listItem.addEventListener("click", (event) => {
         this.selectedColorState.setState(result.colorHexcode);

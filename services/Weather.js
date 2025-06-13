@@ -1,4 +1,6 @@
 import State from "./State.js";
+import Mixer from "../database/models/Mixer.js";
+import Router from "./Router.js";
 
 export default class Weather {
   static currentWeather = new State("weather", null);
@@ -14,24 +16,27 @@ export default class Weather {
     // Wrap geolocation in a Promise
     try {
       const location = await new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition((position) => {
-          if (!position || !position.coords) {
-            reject(new Error("Geolocation position is not available"));
-            return;
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            if (!position || !position.coords) {
+              reject(new Error("Geolocation position is not available"));
+              return;
+            }
+            resolve({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            });
+          },
+          (error) => {
+            reject(error);
           }
-          resolve({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-        },(error)=>{
-          reject(error);
-        });
+        );
       });
 
       if (location) {
         await Weather.updateCurrentWeather(location);
       }
-      return true
+      return true;
     } catch (error) {
       return true;
     }
@@ -72,16 +77,10 @@ export default class Weather {
 
     Weather.currentWeather.setState(data.current);
 
-    Weather._updateWeatherEffects();
+    Weather.#updateWeatherEffects();
   }
 
-  static _updateWeatherEffects() {
-    /**
-     * - [ ] Als het regent of sneeuwt, wordt de mengtijd met 10% verhoogd.
-- [ ] Bij een temperatuur boven de 35 graden mag er maximaal per hal 1 mengmachine draaien.
-- [ ] Als de temperatuur onder de 10 graden ligt, wordt de mengtijd met 15% verhoogd.
-     */
-
+  static #updateWeatherEffects() {
     let mixingTimeMultiplier = 1;
     let maxMixingMachines = 5;
 
@@ -113,6 +112,13 @@ export default class Weather {
     });
   }
 
+  static async mixerLimitReached() {
+    const { mixingroomId } = new Router().getParams();
+    const mixers = await Mixer.find({ mixingroomId: Number(mixingroomId) });
+    const maxMixers = this.weatherEffects.state.maxMixingMachines;
+
+    return mixers.length > maxMixers;
+  }
   constructor() {
     throw new Error("Weather is a static class and cannot be instantiated.");
   }

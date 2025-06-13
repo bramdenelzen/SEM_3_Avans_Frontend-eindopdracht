@@ -9,36 +9,29 @@ export default class IngredientsSection extends WebComponent {
   constructor() {
     super();
 
-    this.ingredientListElement =
-      this.shadowRoot.getElementById("ingredient-list");
+    this.#seedList();
+    this.#updateDisableFormButton();
 
-    this._seedList();
-    IngredientModel.subscribeToModel(this._seedList.bind(this));
-    this._updateDisableFormButton();
+    IngredientModel.subscribeToModel(this.#seedList.bind(this));
   }
 
-  disconnectedCallback() {
-    const form = this.shadowRoot.querySelector("x-ingredientsform");
-    form.removeEventListener("submitSucces", this.submitHandler);
-  }
-
-  async _seedList() {
-    this.ingredientListElement.innerHTML = "";
+  async #seedList() {
+    const ingredientList = this.shadowRoot.getElementById("ingredient-list");
+    ingredientList.innerHTML = "";
     const ingredients = await Ingredient.find({});
 
     for (const ingredient of ingredients) {
-      console.log(ingredients);
       const ingredientListItemElement = document.createElement(
         "x-ingredientlistitem"
       );
 
       ingredientListItemElement.ingredient = ingredient;
-
-      this.ingredientListElement.prepend(ingredientListItemElement);
+      ingredientList.prepend(ingredientListItemElement);
     }
   }
 
-  async _updateDisableFormButton() {
+  //Button should only be enabled in the first mixingroom
+  async #updateDisableFormButton() {
     const { mixingroomId } = new Router().getParams();
     const mixingroom = await MixingRoom.find({});
     const addButton = this.shadowRoot.getElementById("add-ingredient");

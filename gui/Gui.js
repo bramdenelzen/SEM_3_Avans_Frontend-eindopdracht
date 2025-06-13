@@ -5,8 +5,6 @@ export default class Gui {
 
   static registeredGuiFiles = null;
 
-  static #loaded = false;
-
   constructor() {
     throw new Error(
       "Gui is a static class and cannot be instantiated. Use Gui.configure(config) instead."

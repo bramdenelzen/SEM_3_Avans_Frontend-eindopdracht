@@ -7,12 +7,10 @@ import Mixer from "../../../database/models/Mixer.js";
 import Weather from "../../../services/Weather.js";
 
 export default class Jar extends WebComponent {
-  #layers = [];
-
   #ingredients = [];
 
   #jar = null;
-  #currentMixer = null;
+  #currentmixerId = null;
 
   #mixingSpeed = null;
   #minMixingTime = null;
@@ -20,36 +18,24 @@ export default class Jar extends WebComponent {
   constructor() {
     super();
 
-    this.#layers.push(this.shadowRoot.getElementById("layer-3"));
-    this.#layers.push(this.shadowRoot.getElementById("layer-2"));
-    this.#layers.push(this.shadowRoot.getElementById("layer-1"));
+    Weather.weatherEffects.subscribe(this.#updateSpecs.bind(this));
 
-    Weather.weatherEffects.subscribe(this.updateSpecs.bind(this));
+    this.addEventListener("dragstart", this.#dragstartHandler.bind(this));
+    this.addEventListener("drop", this.#dropHandler.bind(this));
+    this.addEventListener("dragover", this.#dragoverHandler.bind(this));
   }
 
   connectedCallback() {
     this.draggable = true;
-    this.addEventListener("dragstart", this._dragstartHandler.bind(this));
-
-    this.shadowRoot.addEventListener("drop", this._dropHandler.bind(this));
-    this.shadowRoot.addEventListener(
-      "dragover",
-      this._dragoverHandler.bind(this)
-    );
-
-    this.updateLayers();
   }
 
   disconnectedCallback() {
-    this.removeEventListener("dragstart", this._dragstartHandler.bind(this));
-    this.shadowRoot.removeEventListener("drop", this._dropHandler.bind(this));
-    this.shadowRoot.removeEventListener(
-      "dragover",
-      this._dragoverHandler.bind(this)
-    );
+    this.removeEventListener("dragstart", this.#dragstartHandler.bind(this));
+    this.removeEventListener("drop", this.#dropHandler.bind(this));
+    this.removeEventListener("dragover", this.#dragoverHandler.bind(this));
   }
 
-  /**
+  /**s
    * @param {JarModel} jar
    */
   set jar(jar) {
@@ -58,50 +44,55 @@ export default class Jar extends WebComponent {
     }
 
     this.#jar = jar;
-    this.__getIngredients();
-    this.#jar.subscribeToInstance(this.update.bind(this));
 
-    Mixer.subscribeToModel((data, type) => {
-      if (this.#jar.id === data.jarId) {
-        this.shadowRoot.getElementById("jar").classList.add("mixing");
-        this.#currentMixer = data.id;
-      } else if (this.#currentMixer == data.id && data.jarId === null) {
-        this.shadowRoot.getElementById("jar").classList.remove("mixing");
-        this.#currentMixer = null;
-      }
+    this.#jar.subscribeToInstance(
+      function (data, type) {
+        if (type === "delete") {
+          this.remove();
+        }
+        if (type === "update") {
+          this.#jar = data;
+        }
+      }.bind(this)
+    );
+
+    Mixer.subscribeToModel(
+      function (data, type) {
+        if (this.#jar.id === data.jarId) {
+          this.shadowRoot.getElementById("jar").classList.add("mixing");
+          this.#currentmixerId = data.id;
+        } else if (this.#currentmixerId == data.id && data.jarId === null) {
+          this.shadowRoot.getElementById("jar").classList.remove("mixing");
+          this.#currentmixerId = null;
+        }
+      }.bind(this)
+    );
+
+    this.#updateIngredients();
+  }
+
+  async #updateIngredients() {
+    const ingredientPivotRecords = await JarHasIngredient.find({
+      jarId: this.#jar.id,
     });
-  }
-
-  update(data, type) {
-    if (type === "delete") {
-      console.log("Jar deleted:", this.#jar.id);
-      this.remove();
-    }
-    if (type === "update") {
-      this.#jar = data;
-      this.__getIngredients();
-      this.updateSpecs();
-      this.updateLayers();
-    }
-  }
-
-  async __getIngredients() {
-    const ingredients = await JarHasIngredient.find({ jarId: this.#jar.id });
 
     this.#ingredients = [];
-    for (const jarIngredient of ingredients) {
-      const ingredient = await Ingredient.findById(jarIngredient.ingredientId);
+
+    for (const jarIngredientPivot of ingredientPivotRecords) {
+      const ingredient = await Ingredient.findById(
+        jarIngredientPivot.ingredientId
+      );
       if (ingredient) {
-        this._addIngredient(ingredient);
+        this.#addIngredient(ingredient);
       } else {
         console.error(
-          `Ingredient with ID ${jarIngredient.ingredientId} not found`
+          `Ingredient with ID ${jarIngredientPivot.ingredientId} not found`
         );
       }
     }
   }
 
-  _addIngredient(ingredient) {
+  #addIngredient(ingredient) {
     if (!(ingredient instanceof Ingredient)) {
       throw new Error("Ingredient must be of type Ingredient");
     }
@@ -115,23 +106,26 @@ export default class Jar extends WebComponent {
 
     this.#ingredients.push(ingredient);
 
-    const minMixingTimeValue = this.#ingredients.reduce(
+    this.#minMixingTime = this.#ingredients.reduce(
       (minTime, ingredient) =>
         minTime > ingredient.minMixingTime ? minTime : ingredient.minMixingTime,
       0
     );
 
-    this.#minMixingTime = minMixingTimeValue;
-    this.updateSpecs();
-    this.updateLayers();
+    this.#updateUi();
   }
 
-  updateSpecs() {
+  #updateUi() {
+    this.#updateSpecs();
+    this.#updateLayers();
+  }
+
+  #updateSpecs() {
     const mixingSpeed = this.shadowRoot.getElementById("mixing-speed");
     const minMixingTime = this.shadowRoot.getElementById("min-mixing-time");
 
     if (this.#ingredients.length === 0) {
-      return
+      return;
     }
 
     mixingSpeed.innerText = this.#mixingSpeed
@@ -148,8 +142,14 @@ export default class Jar extends WebComponent {
     } sec ${multiplierText}`;
   }
 
-  updateLayers() {
-    this.#layers.forEach((layer, index) => {
+  #updateLayers() {
+    const layers = [];
+
+    layers.push(this.shadowRoot.getElementById("layer-3"));
+    layers.push(this.shadowRoot.getElementById("layer-2"));
+    layers.push(this.shadowRoot.getElementById("layer-1"));
+
+    layers.forEach((layer, index) => {
       layer.setAttribute(
         "fill",
         this.#ingredients[index]?.colorHexcode || "#ffffff"
@@ -157,7 +157,7 @@ export default class Jar extends WebComponent {
     });
   }
 
-  async _dragstartHandler(event) {
+  async #dragstartHandler(event) {
     event.dataTransfer.setData(
       "text/plain",
       JSON.stringify({
@@ -177,12 +177,11 @@ export default class Jar extends WebComponent {
         },
       })
     );
-    event.dataTransfer.effectAllowed = "move";
-    event.dataTransfer.dropEffect = "move";
   }
 
-  async _dropHandler(event) {
+  async #dropHandler(event) {
     event.preventDefault();
+
     try {
       const dropEventJSON = JSON.parse(
         event.dataTransfer.getData("text/plain")
@@ -190,25 +189,18 @@ export default class Jar extends WebComponent {
 
       if (!dropEventJSON) {
         throw new Error("Invalid drop event data");
-      }
-
-      if (!dropEventJSON.ingredientId) {
+      } else if (!dropEventJSON.ingredientId) {
         throw new Error("Can only drop ingredients on a jar");
       }
 
       const ingredientId = dropEventJSON.ingredientId;
-
       const ingredient = await Ingredient.findById(ingredientId);
 
       if (!ingredient) {
         throw new Error(`Ingredient with ID ${ingredientId} not found`);
-      }
-
-      if (this.#ingredients.length >= 3) {
+      } else if (this.#ingredients.length >= 3) {
         throw new Error("Jar is full, cannot add more ingredients");
-      }
-
-      if (
+      } else if (
         this.#mixingSpeed !== null &&
         ingredient.minMixingSpeed != this.#mixingSpeed
       ) {
@@ -221,17 +213,15 @@ export default class Jar extends WebComponent {
         jarId: this.#jar.id,
         ingredientId: ingredient.id,
       });
-
       await jarIngredient.save();
 
-      this._addIngredient(ingredient);
+      this.#addIngredient(ingredient);
     } catch (error) {
-      console.error("Error handling drop event:", error);
       new Notification(error.message, "error");
     }
   }
 
-  _dragoverHandler(event) {
+  #dragoverHandler(event) {
     event.preventDefault();
   }
 }

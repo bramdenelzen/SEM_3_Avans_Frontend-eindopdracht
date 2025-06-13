@@ -1,9 +1,8 @@
-import Router from "../../../services/Router.js";
-import WebComponent from "../../Webcomponent.js";
 import config from "../../../config.js";
 import Seed from "../../../database/seeders/Seed.js";
 import { Notification } from "../../../services/Notifications.js";
 import Page from "../Page.js";
+
 export default class Home extends Page {
   constructor() {
     super();

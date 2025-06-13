@@ -8,16 +8,18 @@ import Weather from "../../../services/Weather.js";
 export default class Mixer extends WebComponent {
   #mixer;
 
-  #dragoverHandler;
-  #dropHandler;
-
   constructor() {
     super();
+  }
 
-    this.#dragoverHandler = (event) => {
-      event.preventDefault();
-    };
-    this.#dropHandler = this._drophandler.bind(this);
+  connectedCallback() {
+    this.addEventListener("dragover", this.#dragoverHandler.bind(this));
+    this.addEventListener("drop", this.#drophandler.bind(this));
+  }
+
+  disconnectedCallback() {
+    this.removeEventListener("dragover", this.#dragoverHandler.bind(this));
+    this.removeEventListener("drop", this.#drophandler.bind(this));
   }
 
   /**
@@ -28,50 +30,31 @@ export default class Mixer extends WebComponent {
       throw new Error("Mixer must be an instance of Mixer model");
     }
     this.#mixer = mixer;
+    this.#updateGui();
   }
 
-  connectedCallback() {
-    this.shadowRoot.addEventListener("dragover", this.#dragoverHandler);
-    this.shadowRoot.addEventListener("drop", this.#dropHandler);
-
-    if (!this.#mixer) {
-      throw new Error("Mixer not set");
-    }
-    this.shadowRoot.querySelector("#mixingSpeed").textContent =
+  #updateGui() {
+    this.shadowRoot.getElementById("mixingSpeed").textContent =
       this.#mixer.mixingSpeed + " RPM";
   }
 
-  disconnectedCallback() {
-    this.shadowRoot.removeEventListener("dragover", this.#dragoverHandler);
-    this.shadowRoot.removeEventListener("drop", this.#dropHandler);
-  }
-
-  async _drophandler(event) {
+  async #drophandler(event) {
     event.preventDefault();
 
     if (Weather.weatherEffects.state.maxMixingMachines) {
-      const allMixers = await MixerModel.find({
-        mixingroomId: this.#mixer.mixingroomId,
-      });
-
-      const totalWorkingMixers = allMixers.filter(
-        (mixer) => mixer.jarId != null && mixer.jarId != undefined
-      ).length;
-
       if (
-        totalWorkingMixers >= Weather.weatherEffects.state.maxMixingMachines
+        (await this.#getTotalWorkingMixers()) >=
+        Weather.weatherEffects.state.maxMixingMachines
       ) {
-        console.log(
-          Weather.weatherEffects.state.maxMixingMachines,
-          totalWorkingMixers,
-          allMixers
-        );
         new Notification(
           `You can only have ${Weather.weatherEffects.state.maxMixingMachines} mixers working at the same time due to the current weather conditions.`,
           "error"
         );
         return;
       }
+    } else if (this.#mixer.jarId) {
+      new Notification("Mixer is already mixing", "error");
+      return;
     }
 
     try {
@@ -79,99 +62,107 @@ export default class Mixer extends WebComponent {
         event.dataTransfer.getData("text/plain")
       );
 
-      if (this.#mixer.jarId) {
-        new Notification("Mixer is already mixing", "error");
-        return;
-      }
       if (!dropEventJSON) {
         throw new Error("Something went wrong with the drop event");
-      }
-
-      if (!dropEventJSON.jar) {
+      } else if (!dropEventJSON.jar) {
         throw new Error("You can only drop jars on a mixer");
       }
-      if (dropEventJSON.jar.mixingSpeed !== this.#mixer.mixingSpeed) {
+
+      const jar = dropEventJSON.jar;
+
+      if (jar.mixingSpeed !== this.#mixer.mixingSpeed) {
         throw new Error(
           `You can only drop jars with a mixing speed of ${
             this.#mixer.mixingSpeed
           } RPM`
         );
-      }
-      if (dropEventJSON.jar.ingredients.length === 0) {
+      } else if (jar.ingredients.length === 0) {
         throw new Error("Jar is empty, please add ingredients before mixing");
       }
 
-      await this._mix(dropEventJSON.jar);
+      await this.#mix(jar);
     } catch (error) {
       new Notification(error.message, "error");
     }
   }
 
-  async _mix(jar) {
+  async #getTotalWorkingMixers() {
+    const allMixers = await MixerModel.find({
+      mixingroomId: this.#mixer.mixingroomId,
+    });
+
+    const totalWorkingMixers = allMixers.filter(
+      (mixer) => mixer.jarId != null && mixer.jarId != undefined
+    ).length;
+
+    return totalWorkingMixers;
+  }
+
+  async #mix(jar) {
     new Notification("Mixer started mixing", "info");
+
+    const progressBarFill = this.shadowRoot.getElementById("progress-bar-fill");
+
     try {
+      const duration =
+        jar.mixingTime * Weather.weatherEffects.state.mixingTimeMultiplier;
+
+      this.style.animation = `mixing-speed ${duration}s linear infinite`;
+
       this.#mixer.jarId = parseInt(jar.id);
       await this.#mixer.save();
 
-      const averageColor = this._getAverageColorHex(
+      const averageColor = this.#getAverageColorHex(
         jar.ingredients.map((ingredient) => ingredient.colorHexcode)
       );
 
-      const duration =
-        jar.mixingTime *
-        1000 *
-        Weather.weatherEffects.state.mixingTimeMultiplier;
-      const progressBarFill =
-        this.shadowRoot.getElementById("progress-bar-fill");
-      let start = Date.now();
-
-      this.style.animation = `mixing-speed ${duration / 1000}s linear infinite`;
-
-      await new Promise((resolve) => {
-        const interval = setInterval(() => {
-          const elapsed = Date.now() - start;
-          let progress = Math.min(elapsed / duration, 1);
-          progressBarFill.style.width = progress * 100 + "%";
-
-          if (progress >= 1) {
-            clearInterval(interval);
-            progressBarFill.style.width = "0%";
-            resolve();
-          }
-        }, 50);
-      });
-
       const resultDbRecord = new ResultColor({ colorHexcode: averageColor });
-      this.style.animation = "none";
-
       await resultDbRecord.save();
+
       if (!resultDbRecord.id) {
         throw new Error("Failed to save result color to database");
       }
 
       try {
         const jarRecord = await Jar.findById(jar.id);
-
-        jarRecord.delete();
+        await jarRecord.delete();
       } catch (error) {
-        resultDbRecord.delete();
+        await resultDbRecord.delete();
         throw new Error(`Failed to delete jar from database: ${error.message}`);
       }
-      progressBarFill.style.animation = "none";
-      this.style.animation = "none";
 
-      new Notification("Mixer finished mixing", "success");
       this.#mixer.jarId = null;
       await this.#mixer.save();
+
+      await new Promise((resolve) => {
+        const start = Date.now();
+
+        const interval = setInterval(() => {
+          const elapsed = Date.now() - start;
+
+          let progress = Math.min(elapsed / (duration * 1000), 1);
+          progressBarFill.style.width = progress * 100 + "%";
+
+          if (progress >= 1) {
+               clearInterval(interval);
+              progressBarFill.style.width = "0%";
+              new Notification("Mixer finished mixing", "success");
+            resolve();
+          }
+        }, 50);
+      });
     } catch (error) {
       this.#mixer.jarId = null;
       await this.#mixer.save();
 
       throw new Error(`Something went wrong while mixing: ${error.message}`);
+    } finally {
+      progressBarFill.style.animation = "none";
+      this.style.animation = "none";
     }
   }
 
-  _getAverageColorHex(colors) {
+  #getAverageColorHex(colors) {
     let totalR = 0,
       totalG = 0,
       totalB = 0;
@@ -197,4 +188,8 @@ export default class Mixer extends WebComponent {
       .toString(16)
       .padStart(2, "0")}${avgB.toString(16).padStart(2, "0")}`;
   }
+
+  #dragoverHandler = (event) => {
+    event.preventDefault();
+  };
 }

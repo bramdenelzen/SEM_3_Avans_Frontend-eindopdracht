@@ -5,21 +5,24 @@ import { Notification } from "../../../services/Notifications.js";
 import Weather from "../../../services/Weather.js";
 
 export default class MixerSection extends WebComponent {
+  #form;
+  #formButton;
+  #mixerListElement;
   constructor() {
     super();
-    this.form = this.shadowRoot.getElementById("mixer-form");
-    this.formbutton = this.shadowRoot.getElementById("add-mixer-button");
-    this.mixerListElement = this.shadowRoot.getElementById("mixer-list");
-    this._initializemixerList();
-    Weather.weatherEffects.subscribe(this._updateWarning.bind(this));
+    this.#form = this.shadowRoot.getElementById("mixer-form");
+    this.#formButton = this.shadowRoot.getElementById("add-mixer-button");
+    this.#mixerListElement = this.shadowRoot.getElementById("mixer-list");
+    this.#seedList();
+
+    Weather.weatherEffects.subscribe(this.#updateWarning.bind(this));
   }
-  static cacheInstances = [];
 
   #formSubmitHandler = function (event) {
     const mixer = event.detail.data;
-    this._addMixer(mixer);
+    this.#addMixer(mixer);
 
-    this.form.hidePopover();
+    this.#form.hidePopover();
   }.bind(this);
 
   static getCachedInstance() {
@@ -33,52 +36,52 @@ export default class MixerSection extends WebComponent {
   }
 
   connectedCallback() {
-    this.form.addEventListener("submitSucces", this.#formSubmitHandler);
+    this.#form.addEventListener("submitSucces", this.#formSubmitHandler);
   }
 
   disconnectedCallback() {
-    this.form.removeEventListener("submitSucces", this.#formSubmitHandler);
+    this.#form.removeEventListener("submitSucces", this.#formSubmitHandler);
   }
 
-  async _initializemixerList() {
+  async #seedList() {
     const { mixingroomId } = new Router().getParams();
 
     const mixers = await Mixer.find({ mixingroomId: Number(mixingroomId) });
 
-    this.mixerListElement.innerHTML = "";
+    this.#mixerListElement.innerHTML = "";
 
     for (const mixer of mixers) {
-      this._addMixer(mixer);
+      this.#addMixer(mixer);
     }
   }
 
-  _addMixer(mixer) {
+  #addMixer(mixer) {
     if (!(mixer instanceof Mixer)) {
       throw new Error("Mixer must be an instance of Mixer model");
     }
 
     const mixerELement = document.createElement("x-mixer");
     mixerELement.mixer = mixer;
-    this.mixerListElement.appendChild(mixerELement);
+    this.#mixerListElement.appendChild(mixerELement);
 
     if (
-      this.mixerListElement.children.length >= 5 &&
-      this.formbutton.hasAttribute("popovertarget")
+      this.#mixerListElement.children.length >= 5 &&
+      this.#formButton.hasAttribute("popovertarget")
     ) {
-      this.formbutton.removeAttribute("popovertarget");
-      this.formbutton.addEventListener("click", (event) => {
+      this.#formButton.removeAttribute("popovertarget");
+      this.#formButton.addEventListener("click", (event) => {
         new Notification("You can only have 5 mixers per mixing room", "error");
       });
-    } else if (this.mixerListElement.children.length < 5) {
-      this.formbutton.removeEventListener("click", (event) => {
+    } else if (this.#mixerListElement.children.length < 5) {
+      this.#formButton.removeEventListener("click", (event) => {
         new Notification("You can only have 5 mixers per mixing room", "error");
       });
-      this.formbutton.setAttribute("popovertarget", "mixer-form");
+      this.#formButton.setAttribute("popovertarget", "mixer-form");
     }
-    this._updateWarning();
+    this.#updateWarning();
   }
 
-  async _updateWarning() {
+  async #updateWarning() {
     const { mixingroomId } = new Router().getParams();
     const mixers = await Mixer.find({ mixingroomId: Number(mixingroomId) });
     const warningElement = this.shadowRoot.getElementById("warning");

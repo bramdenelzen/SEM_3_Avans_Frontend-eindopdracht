@@ -51,6 +51,7 @@ export default class MixerForm extends WebComponent {
         new CustomEvent("submitSucces", { detail: { data: mixer } })
       );
       this.formElement.reset();
+      this.hidePopover()
       new Notification("Mixer created successfully", "success");
     } catch (error) {
       this.errorElement.innerText = `** ${error.message} **`;

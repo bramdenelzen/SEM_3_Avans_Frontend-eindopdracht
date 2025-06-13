@@ -1,4 +1,3 @@
-import Error from "../gui/pages/error/Error.js";
 import Page from "../gui/pages/Page.js";
 
 export default class Router {

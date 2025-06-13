@@ -1,9 +1,6 @@
 import State from "../../../services/State.js";
 import EndResults from "../../../database/models/ResultColor.js";
-import WebComponent from "../../Webcomponent.js";
-import ResultColor from "../../../database/models/ResultColor.js";
 import Color from "../../../services/Color.js";
-import { Notification } from "../../../services/Notifications.js";
 import Page from "../Page.js";
 
 export default class ColorTesting extends Page {
@@ -23,15 +20,22 @@ export default class ColorTesting extends Page {
   }
 
   _handleCurrentColorChange(event) {
-    const newColor = new Color(event.detail);
+    const newColor = event.detail && new Color(event.detail);
     const palette = this.shadowRoot.getElementById("color-palette");
 
     if (palette) {
-      palette.style.backgroundColor = newColor.hexCode ?? "transparent";
-      palette.style.color = newColor.hsl.l > 50 ? "black" : "white";
-      palette.innerHTML = `hsl(${newColor.hsl.h}, ${newColor.hsl.s}%, ${newColor.hsl.l}%) <br>
-rgb(${newColor.rgb.r}, ${newColor.rgb.g}, ${newColor.rgb.b}) <br>
-hex: ${newColor.hexCode}`;
+      palette.style.backgroundColor = newColor
+        ? newColor.hexCode
+        : "transparent";
+
+      if (newColor) {
+        palette.style.color = newColor.hsl.l > 50 ? "black" : "white";
+        palette.innerHTML = `hsl(${newColor.hsl.h}, ${newColor.hsl.s}%, ${newColor.hsl.l}%) <br>
+            rgb(${newColor.rgb.r}, ${newColor.rgb.g}, ${newColor.rgb.b}) <br>
+            hex: ${newColor.hexCode}`;
+      } else {
+        palette.innerHTML = "";
+      }
     }
   }
 
