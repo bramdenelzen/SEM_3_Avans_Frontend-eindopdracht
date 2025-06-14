@@ -69,7 +69,7 @@ export default class Color{
         const triadicColors = [];
         for (let i = 0; i < 3; i++) {
             const angle = (hsl.h + i * 120) % 360;
-            triadicColors.push(this._hslToHex(angle, hsl.s, hsl.l));
+            triadicColors.push(new Color(this._hslToHex(angle, hsl.s, hsl.l)));
         }
         return triadicColors;
     }

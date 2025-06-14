@@ -1,26 +1,26 @@
 import Color from "../../../services/Color.js";
 import WebComponent from "../../Webcomponent.js";
 
-export default class ColorTestingCell extends WebComponent{
-    constructor() {
-        super();
-    }
+export default class ColorTestingCell extends WebComponent {
+  constructor() {
+    super();
+  }
 
+  set color(color) {
+    const colorInstance = new Color(color);
+    this.style.backgroundColor = colorInstance.hexCode;
 
-    set color(color){
-        const betterColor = new Color(color);
-        this.style.backgroundColor = betterColor.hexCode;
+    const colorFields = this.shadowRoot.querySelectorAll(".color");
 
-        const colorFields = this.shadowRoot.querySelectorAll(".color");
+    this.shadowRoot.querySelector(".cell").classList.remove("empty");
 
-        this.shadowRoot.querySelector(".cell").classList.remove("empty");
-
-        colorFields.forEach((field, i) => {
-            field.style.backgroundColor = betterColor.TriadicColors[i] ?? "N/A";
-            field.innerHTML =`hsl(${betterColor.hsl.h},${betterColor.hsl.s},${betterColor.hsl.l}) <br>
-            rgb(${betterColor.rgb.r},${betterColor.rgb.g},${betterColor.rgb.b}) <br>
-            hex: ${betterColor.hexCode}`;
-            field.style.color = betterColor.hsl.l > 50 ? "black" : "white";
-        }); 
-    }
+    colorFields.forEach((field, i) => {
+      const triadicColor = colorInstance.TriadicColors[i];
+      field.style.backgroundColor = triadicColor.hexCode ?? "N/A";
+      field.innerHTML = `hsl(${triadicColor.hsl.h},${triadicColor.hsl.s},${triadicColor.hsl.l}) <br>
+            rgb(${triadicColor.rgb.r},${triadicColor.rgb.g},${triadicColor.rgb.b}) <br>
+            hex: ${triadicColor.hexCode}`;
+      field.style.color = triadicColor.hsl.l > 50 ? "black" : "white";
+    });
+  }
 }
