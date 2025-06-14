@@ -22,7 +22,7 @@ export default class Mixer extends BaseModel {
    * @param {number} mixingroomId
    * @param {number} jarId
    */
-  constructor(mixingSpeedOrData,  mixingroomId, jarId) {
+  constructor(mixingSpeedOrData,  mixingroomId, jarId = null) {
     let data;
 
     if (typeof mixingSpeedOrData === "object") {

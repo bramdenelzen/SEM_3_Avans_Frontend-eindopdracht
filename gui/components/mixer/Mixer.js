@@ -10,12 +10,11 @@ export default class Mixer extends WebComponent {
 
   constructor() {
     super();
-  }
-
-  connectedCallback() {
     this.addEventListener("dragover", this.#dragoverHandler.bind(this));
     this.addEventListener("drop", this.#drophandler.bind(this));
   }
+
+  connectedCallback() {}
 
   disconnectedCallback() {
     this.removeEventListener("dragover", this.#dragoverHandler.bind(this));
@@ -38,7 +37,7 @@ export default class Mixer extends WebComponent {
       this.#mixer.mixingSpeed + " RPM";
   }
 
-  async #drophandler(event) {
+  #drophandler = async function (event) {
     event.preventDefault();
 
     if (Weather.weatherEffects.state.maxMixingMachines) {
@@ -84,7 +83,7 @@ export default class Mixer extends WebComponent {
     } catch (error) {
       new Notification(error.message, "error");
     }
-  }
+  };
 
   async #getTotalWorkingMixers() {
     const allMixers = await MixerModel.find({
@@ -131,22 +130,21 @@ export default class Mixer extends WebComponent {
         throw new Error(`Failed to delete jar from database: ${error.message}`);
       }
 
-      this.#mixer.jarId = null;
-      await this.#mixer.save();
-
       await new Promise((resolve) => {
         const start = Date.now();
 
-        const interval = setInterval(() => {
+        const interval = setInterval(async () => {
           const elapsed = Date.now() - start;
 
           let progress = Math.min(elapsed / (duration * 1000), 1);
           progressBarFill.style.width = progress * 100 + "%";
 
           if (progress >= 1) {
-               clearInterval(interval);
-              progressBarFill.style.width = "0%";
-              new Notification("Mixer finished mixing", "success");
+            clearInterval(interval);
+            this.#mixer.jarId = null;
+            await this.#mixer.save();
+            progressBarFill.style.width = "0%";
+            new Notification("Mixer finished mixing", "success");
             resolve();
           }
         }, 50);
@@ -189,7 +187,7 @@ export default class Mixer extends WebComponent {
       .padStart(2, "0")}${avgB.toString(16).padStart(2, "0")}`;
   }
 
-  #dragoverHandler = (event) => {
+  #dragoverHandler = function (event) {
     event.preventDefault();
   };
 }
