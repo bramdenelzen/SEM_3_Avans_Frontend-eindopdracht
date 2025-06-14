@@ -106,7 +106,7 @@ export default class Mixer extends WebComponent {
       const duration =
         jar.mixingTime * Weather.weatherEffects.state.mixingTimeMultiplier;
 
-      this.style.animation = `mixing-speed ${duration}s linear infinite`;
+      this.style.animation = `mixing-speed ${1/jar.mixingSpeed *100}s linear infinite`;
 
       this.#mixer.jarId = parseInt(jar.id);
       await this.#mixer.save();

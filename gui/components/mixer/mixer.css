@@ -44,13 +44,13 @@ align-items: center;
         transform: translateY(0);
     }
     25% {
-        transform: translateY(2px);
+        transform: translateY(5px);
     }
     50% {
-        transform: translateY(-2px);
+        transform: translateY(-5px);
     }
     75% {
-        transform: translateY(2px);
+        transform: translateY(5px);
     }
     100% {
         transform: translateY(0);
