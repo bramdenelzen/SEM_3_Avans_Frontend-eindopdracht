@@ -1,37 +1,39 @@
 export default class State {
+  #subscribers = [];
 
-  #subscribers = []
+  #state;
+  #stateName;
 
-  constructor(stateName,initialState = null) {
-    this._state = initialState;
-    this._stateName = stateName;
+  constructor(stateName, initialState = null) {
+    this.#state = initialState;
+    this.#stateName = stateName;
   }
 
   get state() {
-    return this._state;
+    return this.#state;
   }
 
-  setState(stateOrArrowFunction){
+  setState(stateOrArrowFunction) {
     if (typeof stateOrArrowFunction === "function") {
-      this._state = stateOrArrowFunction(this._state);
+      this.#state = stateOrArrowFunction(this.#state);
     } else {
-      this._state = stateOrArrowFunction;
+      this.#state = stateOrArrowFunction;
     }
-    this._notify()
+    this.#notify();
   }
   set(key, value) {
     this.state[key] = value;
-    this._notify(key, value);
+    this.#notify(key, value);
   }
 
-  _notify() {
-   this.#subscribers.forEach((callback) => {
-      const event = new CustomEvent(this._stateName + "Change", {
-        detail: this._state,
+  #notify() {
+    this.#subscribers.forEach((callback) => {
+      const event = new CustomEvent(this.#stateName + "Change", {
+        detail: this.#state,
       });
 
       document.dispatchEvent(event);
-      
+
       callback(event);
     });
   }

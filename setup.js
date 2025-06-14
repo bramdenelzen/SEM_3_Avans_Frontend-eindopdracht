@@ -4,7 +4,7 @@ import BaseModel from "./database/models/BaseModel.js";
 import Router from "./services/Router.js";
 import Seed from "./database/seeders/Seed.js";
 import Weather from "./services/Weather.js";
-import { ENV } from "./env.js";
+import ENV from "./env.js";
 
 await Weather.configure(ENV.WEATHER_API_KEY);
 
