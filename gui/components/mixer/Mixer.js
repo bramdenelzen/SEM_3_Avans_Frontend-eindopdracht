@@ -115,21 +115,6 @@ export default class Mixer extends WebComponent {
         jar.ingredients.map((ingredient) => ingredient.colorHexcode)
       );
 
-      const resultDbRecord = new ResultColor({ colorHexcode: averageColor });
-      await resultDbRecord.save();
-
-      if (!resultDbRecord.id) {
-        throw new Error("Failed to save result color to database");
-      }
-
-      try {
-        const jarRecord = await Jar.findById(jar.id);
-        await jarRecord.delete();
-      } catch (error) {
-        await resultDbRecord.delete();
-        throw new Error(`Failed to delete jar from database: ${error.message}`);
-      }
-
       await new Promise((resolve) => {
         const start = Date.now();
 
@@ -140,11 +125,29 @@ export default class Mixer extends WebComponent {
           progressBarFill.style.width = progress * 100 + "%";
 
           if (progress >= 1) {
-            clearInterval(interval);
+            const resultDbRecord = new ResultColor({
+              colorHexcode: averageColor,
+            });
+            await resultDbRecord.save();
+
+            if (!resultDbRecord.id) {
+              throw new Error("Failed to save result color to database");
+            }
+
+            try {
+              const jarRecord = await Jar.findById(jar.id);
+              await jarRecord.delete();
+            } catch (error) {
+              await resultDbRecord.delete();
+              throw new Error(
+                `Failed to delete jar from database: ${error.message}`
+              );
+            }
             this.#mixer.jarId = null;
             await this.#mixer.save();
             progressBarFill.style.width = "0%";
             new Notification("Mixer finished mixing", "success");
+            clearInterval(interval);
             resolve();
           }
         }, 50);
