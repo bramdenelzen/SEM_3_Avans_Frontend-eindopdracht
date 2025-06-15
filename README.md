@@ -22,8 +22,8 @@ Dit project is een eindopdracht voor het derde semester JavaScript van Avans. He
 
 ## Opmerkingen
 
-- Alle database interacties zijn asynchroon.
 - Deze applicatie maakt gebruik van weatherapi.com. Zet hiervan de api key in je env.js file
+- Puur client side javascript, geen nodeJS
 
 
 ## Auteur
