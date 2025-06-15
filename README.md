@@ -2,7 +2,7 @@
 
 ## Overzicht
 
-Dit project is een eindopdracht voor het derde semester JavaScript. Het bevat een webapplicatie met:
+Dit project is een eindopdracht voor het derde semester JavaScript van Avans. Het bevat een webapplicatie met:
 - Custom Elements (dmv Web Components)
 - Een eigen Router
 - Dynamische pagina’s en componenten
@@ -23,6 +23,8 @@ Dit project is een eindopdracht voor het derde semester JavaScript. Het bevat ee
 ## Opmerkingen
 
 - Alle database interacties zijn asynchroon.
+- Deze applicatie maakt gebruik van weatherapi.com. Zet hiervan de api key in je env.js file
+
 
 ## Auteur
 
