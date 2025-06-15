@@ -51,7 +51,8 @@ export default class Mixer extends WebComponent {
         );
         return;
       }
-    } else if (this.#mixer.jarId) {
+    }
+    if (this.#mixer.jarId) {
       new Notification("Mixer is already mixing", "error");
       return;
     }
@@ -63,7 +64,8 @@ export default class Mixer extends WebComponent {
 
       if (!dropEventJSON) {
         throw new Error("Something went wrong with the drop event");
-      } else if (!dropEventJSON.jar) {
+      }
+      if (!dropEventJSON.jar) {
         throw new Error("You can only drop jars on a mixer");
       }
 
@@ -75,7 +77,8 @@ export default class Mixer extends WebComponent {
             this.#mixer.mixingSpeed
           } RPM`
         );
-      } else if (jar.ingredients.length === 0) {
+      }
+      if (jar.ingredients.length === 0) {
         throw new Error("Jar is empty, please add ingredients before mixing");
       }
 
@@ -106,7 +109,9 @@ export default class Mixer extends WebComponent {
       const duration =
         jar.mixingTime * Weather.weatherEffects.state.mixingTimeMultiplier;
 
-      this.style.animation = `mixing-speed ${1/jar.mixingSpeed *100}s linear infinite`;
+      this.style.animation = `mixing-speed ${
+        (1 / jar.mixingSpeed) * 100
+      }s linear infinite`;
 
       this.#mixer.jarId = parseInt(jar.id);
       await this.#mixer.save();
