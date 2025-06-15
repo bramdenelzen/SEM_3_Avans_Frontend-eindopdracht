@@ -11,10 +11,10 @@ export default class ColorTesting extends Page {
 
     const columns = 6;
     const rows = 4;
-    this._initializeGrid(columns, rows);
+    this.#initializeGrid(columns, rows);
 
-    EndResults.subscribeToModel(this._initializeResults.bind(this));
-    this._initializeResults();
+    EndResults.subscribeToModel(this.#initializeResults.bind(this));
+    this.#initializeResults();
 
     this.selectedColor.subscribe(this._handleCurrentColorChange.bind(this));
   }
@@ -39,7 +39,7 @@ export default class ColorTesting extends Page {
     }
   }
 
-  _initializeGrid(columns, rows) {
+  #initializeGrid(columns, rows) {
     const grid = this.shadowRoot.getElementById("grid");
 
     for (let row = 0; row < rows; row++) {
@@ -66,7 +66,7 @@ export default class ColorTesting extends Page {
     }
   }
 
-  async _initializeResults() {
+  async #initializeResults() {
     const endresultsElement = this.shadowRoot.querySelector("x-endresults");
     if (endresultsElement) {
       endresultsElement.selectedColorState.subscribe((event) => {

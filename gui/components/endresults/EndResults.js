@@ -5,11 +5,11 @@ import ColorTesting from "../../pages/colortesting/ColorTesting.js";
 
 export default class EndResults extends WebComponent {
 
-  selectedColorState;
 
   constructor() {
     super();
     this.#seedList();
+    // Is public so that the ColorTesting page can access it
     this.selectedColorState = new State("selectedColor", null);
 
     ResultColor.subscribeToModel(this.#seedList.bind(this));
@@ -44,9 +44,9 @@ export default class EndResults extends WebComponent {
       resultsList.appendChild(listItem);
 
 
-      listItem.addEventListener("click", (event) => {
+      listItem.addEventListener("click", function() {
         this.selectedColorState.setState(result.colorHexcode);
-      });
+      }.bind(this));
     });
   }
 }

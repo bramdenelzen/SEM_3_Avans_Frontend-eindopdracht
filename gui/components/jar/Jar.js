@@ -23,16 +23,22 @@ export default class Jar extends WebComponent {
     this.addEventListener("dragstart", this.#dragstartHandler.bind(this));
     this.addEventListener("drop", this.#dropHandler.bind(this));
     this.addEventListener("dragover", this.#dragoverHandler.bind(this));
+    
+    Mixer.subscribeToModel(
+      function (data, type) {
+        if (this.#jar.id === data.jarId) {
+          this.shadowRoot.getElementById("jar").classList.add("mixing");
+          this.#currentmixerId = data.id;
+        } else if (this.#currentmixerId == data.id && data.jarId === null) {
+          this.shadowRoot.getElementById("jar").classList.remove("mixing");
+          this.#currentmixerId = null;
+        }
+      }.bind(this)
+    );
   }
 
   connectedCallback() {
     this.draggable = true;
-  }
-
-  disconnectedCallback() {
-    this.removeEventListener("dragstart", this.#dragstartHandler.bind(this));
-    this.removeEventListener("drop", this.#dropHandler.bind(this));
-    this.removeEventListener("dragover", this.#dragoverHandler.bind(this));
   }
 
   /**s
@@ -52,18 +58,6 @@ export default class Jar extends WebComponent {
         }
         if (type === "update") {
           this.#jar = data;
-        }
-      }.bind(this)
-    );
-
-    Mixer.subscribeToModel(
-      function (data, type) {
-        if (this.#jar.id === data.jarId) {
-          this.shadowRoot.getElementById("jar").classList.add("mixing");
-          this.#currentmixerId = data.id;
-        } else if (this.#currentmixerId == data.id && data.jarId === null) {
-          this.shadowRoot.getElementById("jar").classList.remove("mixing");
-          this.#currentmixerId = null;
         }
       }.bind(this)
     );

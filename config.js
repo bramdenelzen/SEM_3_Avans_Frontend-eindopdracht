@@ -12,6 +12,7 @@ import ResultColor from "./database/models/ResultColor.js";
 import Ingredient from "./database/models/Ingredient.js";
 import Home from "./gui/pages/home/Home.js";
 import ColorTesting from "./gui/pages/colortesting/ColorTesting.js";
+import RuntimeStorageDB from "./database/handlers/RuntimeStorageDB.js";
 
 export default {
   Router: {

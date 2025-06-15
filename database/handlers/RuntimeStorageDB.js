@@ -1,67 +1,61 @@
 import DatabaseInterface from "./DatabaseInterface.js";
 
 export default class RuntimeStorageDB extends DatabaseInterface {
+  static #storage = {};
 
   constructor() {
-    super();
-    this.db = new Map(); // Map<modelName, Map<id, record>>
-    this.idCounter = 1;
+    throw new Error("RuntimeStorageDB is a static class and cannot be instantiated.");
   }
 
-  _getModelStore(modelName) {
-    if (!this.db.has(modelName)) {
-      this.db.set(modelName, new Map());
-    }
-    return this.db.get(modelName);
+  static #getCollection(modelName) {
+    return this.#storage[modelName] ? [...this.#storage[modelName]] : [];
   }
 
-  async create(modelName, data) {
-    const store = this._getModelStore(modelName);
-    const id = this.idCounter++;
-    const newData = { ...data, id };
-    store.set(id, newData);
-    return { ...newData };
+  static _setCollection(modelName, collection) {
+    this.#storage[modelName] = [...collection];
   }
 
-  async read(modelName, query = {}) {
-    const store = this._getModelStore(modelName);
-    const all = Array.from(store.values());
+  static async create(modelName, data) {
+    const collection = this.#getCollection(modelName);
+    const newItem = {
+      ...data,
+      id: data.id ?? Date.now() + Math.floor(Math.random() * 10000),
+    };
+    collection.push(newItem);
+    this._setCollection(modelName, collection);
+    return newItem;
+  }
 
-    // Simple query filtering: match all key/value pairs
-    const filtered = all.filter((record) =>
-      Object.entries(query).every(([key, value]) => record[key] === value)
+  static async read(modelName, query = {}) {
+    const collection = this.#getCollection(modelName);
+    if (!query || Object.keys(query).length === 0) return collection;
+
+    return collection.filter((item) =>
+      Object.entries(query).every(([key, value]) => item[key] === value)
     );
-
-    return filtered.map((record) => ({ ...record }));
   }
 
-  async update(modelName, id, updates) {
-    const store = this._getModelStore(modelName);
-    if (!store.has(id)) {
-      throw new Error(`Record with id ${id} not found`);
-    }
+  static async update(modelName, id, updates) {
+    const collection = this.#getCollection(modelName);
+    const index = collection.findIndex((item) => item.id === id);
+    if (index === -1) return null;
 
-    const existing = store.get(id);
-    const updated = { ...existing, ...updates };
-    store.set(id, updated);
-    return { ...updated };
+    const updatedItem = { ...collection[index], ...updates, id };
+    collection[index] = updatedItem;
+    this._setCollection(modelName, collection);
+    return updatedItem;
   }
 
-  async delete(modelName, id) {
-    const store = this._getModelStore(modelName);
-    if (!store.has(id)) {
-      throw new Error(`Record with id ${id} not found`);
-    }
-    store.delete(id);
-    return true;
+  static async delete(modelName, id) {
+    let collection = this.#getCollection(modelName);
+    const initialLength = collection.length;
+    collection = collection.filter((item) => item.id !== id);
+    this._setCollection(modelName, collection);
+    return collection.length < initialLength;
   }
 
-  async reset(modelName) {
-    if (!this.db.has(modelName)) {
-      return true;
-    }
-    this._getModelStore(modelName).clear()
-    this.idCounter = 1;
-    return true;
+  static async reset(modelName) {
+    delete this.#storage[modelName];
+    return !(modelName in this.#storage);
   }
 }

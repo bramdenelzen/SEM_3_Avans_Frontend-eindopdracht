@@ -14,8 +14,6 @@ export default class Mixer extends WebComponent {
     this.addEventListener("drop", this.#drophandler.bind(this));
   }
 
-  connectedCallback() {}
-
   disconnectedCallback() {
     this.removeEventListener("dragover", this.#dragoverHandler.bind(this));
     this.removeEventListener("drop", this.#drophandler.bind(this));
@@ -130,40 +128,40 @@ export default class Mixer extends WebComponent {
           progressBarFill.style.width = progress * 100 + "%";
 
           if (progress >= 1) {
-            const resultDbRecord = new ResultColor({
-              colorHexcode: averageColor,
-            });
-            await resultDbRecord.save();
-
-            if (!resultDbRecord.id) {
-              throw new Error("Failed to save result color to database");
-            }
-
-            try {
-              const jarRecord = await Jar.findById(jar.id);
-              await jarRecord.delete();
-            } catch (error) {
-              await resultDbRecord.delete();
-              throw new Error(
-                `Failed to delete jar from database: ${error.message}`
-              );
-            }
-            this.#mixer.jarId = null;
-            await this.#mixer.save();
-            progressBarFill.style.width = "0%";
-            new Notification("Mixer finished mixing", "success");
             clearInterval(interval);
             resolve();
           }
         }, 50);
       });
+
+      const resultDbRecord = new ResultColor({
+        colorHexcode: averageColor,
+      });
+      await resultDbRecord.save();
+
+      if (!resultDbRecord.id) {
+        throw new Error("Failed to save result color to database");
+      }
+
+      try {
+        const jarRecord = await Jar.findById(jar.id);
+        await jarRecord.delete();
+      } catch (error) {
+        await resultDbRecord.delete();
+        throw new Error(`Failed to delete jar from database: ${error.message}`);
+      }
+      this.#mixer.jarId = null;
+      await this.#mixer.save();
+      progressBarFill.style.width = "0%";
+      new Notification("Mixer finished mixing", "success");
     } catch (error) {
+      throw new Error(`Something went wrong while mixing: ${error.message}`);
+    } finally {
       this.#mixer.jarId = null;
       await this.#mixer.save();
 
-      throw new Error(`Something went wrong while mixing: ${error.message}`);
-    } finally {
       progressBarFill.style.animation = "none";
+      progressBarFill.style.width = "0%";
       this.style.animation = "none";
     }
   }
