@@ -4,17 +4,11 @@ import { Notification } from "../../../services/Notifications.js";
 import Mixer from "../../../database/models/Mixer.js";
 import JarHasIngredient from "../../../database/models/JarHasIngredient.js";
 
-let counter = 0;
-
 export default class JarsSection extends WebComponent {
-  static #currentlySeeding = false;
-
   constructor() {
     super();
     Jar.subscribeToModel(this.#seedList.bind(this));
-    JarHasIngredient.subscribeToModel(
-      this.#seedList.bind(this)
-    );
+    JarHasIngredient.subscribeToModel(this.#seedList.bind(this));
     this.#seedList();
   }
 
@@ -35,7 +29,6 @@ export default class JarsSection extends WebComponent {
         name: "new Jar",
       });
       await jar.save();
-      console.log("Jar created", jar);
 
       new Notification("Jar created successfully", "success");
     } catch (error) {
@@ -46,10 +39,6 @@ export default class JarsSection extends WebComponent {
   async #seedList() {
     const jarListElement = this.shadowRoot.getElementById("jar-list");
 
-    // while (JarsSection.#currentlySeeding) {
-    //   await new Promise(resolve => setTimeout(resolve, 100));
-    // }
-    JarsSection.#currentlySeeding = true;
     jarListElement.innerHTML = "";
     const jars = await Jar.find({});
 
@@ -65,6 +54,5 @@ export default class JarsSection extends WebComponent {
 
       jarListElement.prepend(jarElement);
     }
-    JarsSection.#currentlySeeding = false;
   }
 }
