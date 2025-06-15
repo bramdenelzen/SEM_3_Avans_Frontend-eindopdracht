@@ -29,7 +29,7 @@ export default class ColorTesting extends Page {
         : "transparent";
 
       if (newColor) {
-        palette.style.color = newColor.hsl.l > 50 ? "black" : "white";
+        palette.style.color = newColor.hsl.l >= 50 ? "black" : "white";
         palette.innerHTML = `hsl(${newColor.hsl.h}, ${newColor.hsl.s}%, ${newColor.hsl.l}%) <br>
             rgb(${newColor.rgb.r}, ${newColor.rgb.g}, ${newColor.rgb.b}) <br>
             hex: ${newColor.hexCode}`;

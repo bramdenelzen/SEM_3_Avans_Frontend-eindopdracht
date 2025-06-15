@@ -64,7 +64,7 @@ export default class Color{
         return hexColor;
     }
 
-    get TriadicColors() {
+    get triadicColors() {
         const hsl = this.hsl;
         const triadicColors = [];
         for (let i = 0; i < 3; i++) {

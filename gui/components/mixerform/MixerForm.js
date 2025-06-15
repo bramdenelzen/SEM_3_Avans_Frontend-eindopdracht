@@ -5,29 +5,29 @@ import Mixer from "../../../database/models/Mixer.js";
 import Router from "../../../services/Router.js";
 
 export default class MixerForm extends WebComponent {
-  #submitHandler;
+  #boundSubmitHandler;
 
   constructor() {
     super();
 
-    this.#submitHandler = this.submitHandler.bind(this);
+    this.#boundSubmitHandler = this.#submitHandler.bind(this);
     this.formElement = this.shadowRoot.querySelector("form");
     this.errorElement = this.shadowRoot.getElementById("error");
   }
 
   connectedCallback() {
-    this.formElement.addEventListener("submit", this.#submitHandler);
+    this.formElement.addEventListener("submit", this.#boundSubmitHandler);
   }
 
   disconnectedCallback() {
-    this.formElement.removeEventListener("submit", this.#submitHandler);
+    this.formElement.removeEventListener("submit", this.#boundSubmitHandler);
   }
 
   /**
    *
    * @param {SubmitEvent} event
    */
-  async submitHandler(event) {
+  async #submitHandler(event) {
     event.preventDefault();
     this.errorElement.innerText = "";
 

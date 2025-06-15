@@ -4,13 +4,13 @@ import WebComponent from "../../Webcomponent.js";
 export default class ToastList extends WebComponent {
   constructor() {
     super();
-    Notifications.onChange(this._manageToasts.bind(this));
+    Notifications.onChange(this.#manageToasts.bind(this));
   }
 
   /**
    * @param {[Notification]} notification 
    */
-  _manageToasts(notifications) {
+  #manageToasts(notifications) {
     const list = this.shadowRoot.querySelector("ul");
     list.innerHTML = "";
     for (const notification of notifications) {
